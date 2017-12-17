@@ -23,6 +23,7 @@
 # Ignore SETUP_USE_CUSTOM files
 /config/database.mysql.yml.custom
 /.env.bootstrap.custom
+/db/seeds.custom.yml
 
 /node_modules
 
