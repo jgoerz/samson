@@ -52,17 +52,17 @@ else
   #     email: "seed@example.com"
   #     external_id: "123"
 
-  data = YAML.load(File.read('db/seeds.custom.yml'))
+  data = YAML.safe_load(File.read('db/seeds.custom.yml'))
 
   # Load projects, and their stages and commands.
-  if data.has_key?('projects')
+  if data.key?('projects')
     data['projects'].each do |project|
       p_obj = Project.create!(
         name: project['name'],
         repository_url: project['repository_url']
       )
 
-      if project.has_key?('stages')
+      if project.key?('stages')
         project['stages'].each do |stage|
           p_obj.stages.create!(
             name: stage['name'],
@@ -73,7 +73,7 @@ else
       end
 
       # per project commands
-      if project.has_key?('commands')
+      if project.key?('commands')
         project['commands'].each do |command|
           p_obj.commands.create!(
             command: command['command']
@@ -88,7 +88,7 @@ else
   # example gitlab: gitlab-123
   # example ldap: ldap-CN=Mr. Seed,OU=Employees,...
   # role_id: (see app/models/role.rb for appropriate values)
-  if data.has_key?('users')
+  if data.key?('users')
     data['users'].each do |user|
       User.create!(
         time_format: user['time_format'],
@@ -101,7 +101,7 @@ else
   end
 
   # Global Commands
-  if data.has_key?('commands')
+  if data.key?('commands')
     data['commands'].each do |command|
       Command.create!(
           command: command['command']
