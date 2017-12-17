@@ -44,12 +44,18 @@ try() {
 
 try "Installing bundler" "install_gem bundler"
 try "Bundling" "bundle check > /dev/null || bundle --local --quiet "
-
 echo
-bold "Copying example files"
-try "Creating .env" "test -e .env || cp .env.bootstrap .env"
-try "Creating config/database.yml" "test -e config/database.yml || cp config/database.mysql.yml.example config/database.yml"
-try "Creating databases" "bundle exec rake db:setup > /dev/null"
 
+if test -n $SETUP_USE_CUSTOM; then 
+  bold "Copying custom setup files"
+  try "Creating .env" "test -e .env || cp .env.bootstrap.custom .env"
+  try "Creating config/database.yml" "test -e config/database.yml || cp config/database.mysql.yml.custom config/database.yml"
+else
+  bold "Copying example files"
+  try "Creating .env" "test -e .env || cp .env.bootstrap .env"
+  try "Creating config/database.yml" "test -e config/database.yml || cp config/database.mysql.yml.example config/database.yml"
+fi
+
+try "Creating databases" "bundle exec rake db:setup > /dev/null"
 echo
 bold "Success!"

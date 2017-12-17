@@ -20,6 +20,10 @@
 # Ignore config
 /config/database.yml
 
+# Ignore SETUP_USE_CUSTOM files
+/config/database.mysql.yml.custom
+/.env.bootstrap.custom
+
 /node_modules
 
 /public/assets
