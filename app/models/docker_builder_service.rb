@@ -85,7 +85,7 @@ class DockerBuilderService
       )
     else
       build.docker_image = ImageBuilder.build_image(
-        tmp_dir, @output, dockerfile: build.dockerfile, cache_from: cache
+        tmp_dir, @execution.executor, dockerfile: build.dockerfile, cache_from: cache
       )
     end
   end
@@ -123,7 +123,7 @@ class DockerBuilderService
         @output.puts("### Pushing Docker image to #{repo} without tag")
       end
 
-      ImageBuilder.send(:local_docker_login) do |login_commands|
+      ImageBuilder.local_docker_login do |login_commands|
         full_tag = "#{repo}:#{tag}"
 
         @execution.executor.quiet do

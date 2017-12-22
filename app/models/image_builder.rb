@@ -4,31 +4,30 @@ require 'shellwords'
 
 class ImageBuilder
   class << self
-    def build_image(dir, output, dockerfile:, tag: nil, cache_from: nil)
+    def build_image(dir, executor, dockerfile:, tag: nil, cache_from: nil)
       local_docker_login do |login_commands|
         tag = " -t #{tag.shellescape}" if tag
         file = " -f #{dockerfile.shellescape}"
-        executor = TerminalExecutor.new(output)
 
-        if cache_from
-          pull_cache = executor.verbose_command("docker pull #{cache_from.shellescape} || true")
-          cache_option = " --cache-from #{cache_from.shellescape}"
+        executor.quiet do
+          if cache_from
+            pull_cache = executor.verbose_command("docker pull #{cache_from.shellescape} || true")
+            cache_option = " --cache-from #{cache_from.shellescape}"
+          end
+
+          build = "docker build#{file}#{tag} .#{cache_option}"
+
+          return unless executor.execute(
+            "cd #{dir.shellescape}",
+            *login_commands,
+            *pull_cache,
+            executor.verbose_command(build)
+          )
         end
-
-        build = "docker build#{file}#{tag} .#{cache_option}"
-
-        return unless executor.execute(
-          "cd #{dir.shellescape}",
-          *login_commands,
-          *pull_cache,
-          executor.verbose_command(build)
-        )
-        image_id = output.to_s.scan(/Successfully built (\S+)/).last&.first
+        image_id = executor.output.to_s.scan(/Successfully built (\S+)/).last&.first
         Docker::Image.get(image_id) if image_id
       end
     end
-
-    private
 
     # store logins in a temp file and make it not accidentally added via `ADD .`
     def local_docker_login
@@ -49,6 +48,8 @@ class ImageBuilder
         yield ["export DOCKER_CONFIG=#{docker_config_folder.shellescape}", *credentials]
       end
     end
+
+    private
 
     # TODO: same as in config/initializers/docker.rb ... dry it up
     def docker_major_version
