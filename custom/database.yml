@@ -1,0 +1,25 @@
+<%
+  uri = URI(ENV['DATABASE_URL'] || 'mysql://root@127.0.0.1:3306')
+  uri.scheme = 'mysql2'
+%>
+
+development:
+  <% uri.path = "/samson_development" %>
+  url: <%= uri %>
+  pool: <%= ENV['RAILS_MAX_THREADS'] %>
+  username: <%= ENV['DATABASE_USER'] || 'root' %>
+  password: <%= ENV['DATABASE_PASSWORD'] || 'password' %>
+
+test:
+  <% uri.path = "/samson_test#{ENV['TEST_ENV_NUMBER']}"%>
+  url: <%= uri %>
+  pool: <%= ENV['RAILS_MAX_THREADS'] %>
+  username: <%= ENV['DATABASE_USER'] || 'root' %>
+  password: <%= ENV['DATABASE_PASSWORD'] || 'password' %>
+
+production:
+  <% uri.path = "/samson_production"%>
+  url: <%= uri %>
+  pool: <%= ENV['RAILS_MAX_THREADS'] %>
+  username: <%= ENV['DATABASE_USER'] %>
+  password: <%= ENV['DATABASE_PASSWORD'] %>

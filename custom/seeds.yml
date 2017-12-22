@@ -1,0 +1,452 @@
+---
+projects:
+  - name: Benefits Application
+    repository_url: "git@git.plansource.com:app/benefits.git"
+    stages:
+      - name: DEV Apps
+        production: false
+        cancel_queued_deploys: true
+      - name: DEV Utility
+        production: false
+        cancel_queued_deploys: true
+      - name: Partner DEV Apps
+        production: false
+        cancel_queued_deploys: true
+      - name: Partner DEV Utility
+        production: false
+        cancel_queued_deploys: true
+      - name: UAT Apps
+        production: false
+        cancel_queued_deploys: true
+      - name: UAT Utility
+        production: false
+        cancel_queued_deploys: true
+      - name: RC Apps
+        production: false
+        cancel_queued_deploys: true
+      - name: RC Utility
+        production: false
+        cancel_queued_deploys: true
+    commands:
+      - command: 'echo "test"'
+  - name: Broker Application
+    repository_url: "git@git.plansource.com:app/broker.git"
+    stages:
+      - name: DEV Apps
+        production: false
+        cancel_queued_deploys: true
+      - name: Partner DEV Apps
+        production: false
+        cancel_queued_deploys: true
+      - name: UAT Apps
+        production: false
+        cancel_queued_deploys: true
+      - name: RC Apps
+        production: false
+        cancel_queued_deploys: true
+  - name: Admin Application
+    repository_url: "git@git.plansource.com:app/admin.git"
+    stages:
+      - name: DEV Apps
+        production: false
+        cancel_queued_deploys: true
+      - name: Partner DEV Apps
+        production: false
+        cancel_queued_deploys: true
+      - name: UAT Apps
+        production: false
+        cancel_queued_deploys: true
+      - name: RC Apps
+        production: false
+        cancel_queued_deploys: true
+  - name: Carrier Application
+    repository_url: "git@git.plansource.com:app/carrier.git"
+    stages:
+      - name: DEV Apps
+        production: false
+        cancel_queued_deploys: true
+        project: Carrier Application
+      - name: Partner DEV Apps
+        production: false
+        cancel_queued_deploys: true
+        project: Carrier Application
+      - name: UAT Apps
+        production: false
+        cancel_queued_deploys: true
+        project: Carrier Application
+      - name: RC Apps
+        production: false
+        cancel_queued_deploys: true
+        project: Carrier Application
+commands:
+  - command: "sed -e '/set :create_git_tag, true/ s/^#*/#/' -i config/deploy/development.rb'"
+    project:
+  - command: "sed -e '/set :create_git_tag, true/ s/^#*/#/' -i config/deploy/development-utility.rb'"
+    project:
+  - command: "sed -e '/set :create_git_tag, true/ s/^#*/#/' -i config/deploy/uat.rb'"
+    project:
+  - command: "sed -e '/set :create_git_tag, true/ s/^#*/#/' -i config/deploy/uat-utility.rb'"
+    project:
+  - command: "sed -e '/set :create_git_tag, true/ s/^#*/#/' -i config/deploy/rc.rb'"
+    project:
+  - command: "sed -e '/set :create_git_tag, true/ s/^#*/#/' -i config/deploy/rc-utility.rb'"
+    project:
+  - command: "sed -e '/set :create_git_tag, true/ s/^#*/#/' -i config/deploy/partner-dev.rb'"
+    project:
+  - command: "sed -e '/set :create_git_tag, true/ s/^#*/#/' -i config/deploy/partner-dev-utility.rb'"
+    project:
+  - command: 'export STAGE_NAME="development"'
+    project:
+  - command: 'export STAGE_NAME="development-utility"'
+    project:
+  - command: 'export STAGE_DEFAULT_BRANCH="develop"'
+    project:
+  - command: 'export STAGE_DEFAULT_BRANCH="rc-patches"'
+    project:
+  - command: |2
+        # Create or update PsSypder
+        # $STAGE_DEFAULT_BRANCH needs to be set
+        if [ -d ../gems/ps_spyder ]; then
+          : # nop
+        else
+          mkdir -p ../gems
+          git clone git@git.plansource.com:gem/ps_spyder.git ../gems/ps_spyder
+        fi
+        cd ../gems/ps_spyder
+        git checkout $STAGE_DEFAULT_BRANCH
+        git pull
+        cd -
+    project:
+  - command: |2
+        # Create or update GEMS
+        # $STAGE_DEFAULT_BRANCH needs to be set
+        if [ -d ../gems/ps-shared ]; then
+          : # nop
+        else
+          mkdir -p ../gems
+          git clone git@git.plansource.com:app/ps-shared.git ../gems/ps-shared
+        fi
+        cd ../gems/ps-shared
+        git checkout $STAGE_DEFAULT_BRANCH
+        git pull
+        cd -
+
+        if [ -d ../gems/ps-shared-assets ]; then
+          : # nop
+        else
+          mkdir -p ../gems
+          git clone git@git.plansource.com:app/ps-shared-assets.git ../gems/ps-shared-assets
+        fi
+        cd ../gems/ps-shared-assets
+        git checkout $STAGE_DEFAULT_BRANCH
+        git pull
+        cd -
+    project:
+  - command: |2
+        # Bundles and deploys your project
+        # $STAGE_NAME needs to be set
+        if [ -d vendor/cache ]; then BUNDLE_ARGS="--local"; else BUNDLE_ARGS=""; fi
+        bundle install $BUNDLE_ARGS --jobs 4 --without test --path $CACHE_DIR/bundle --quiet
+        bundle exec cap $STAGE_NAME deploy --trace
+    project: not set
+  - command: |2
+        ruby --version
+        gem list
+        gem env
+    project: not set
+users:
+  - name: Anooj Rajan
+    role_id: 1
+    email: Anooj.Rajan@plansource.com
+    external_id: ldap-CN=Anooj Rajan,OU=Employees,OU=SLC,OU=People,DC=plansource,DC=local
+    time_format: relative
+  - name: Bobby Schmidt
+    role_id: 1
+    email: bobby.schmidt@plansource.com
+    external_id: ldap-CN=Bobby Schmidt,OU=Employees,OU=ORL,OU=People,DC=plansource,DC=local
+    time_format: relative
+  - name: Brett Krchnavy
+    role_id: 1
+    email: Brett.Krchnavy@plansource.com
+    external_id: ldap-CN=Brett Krchnavy,OU=Employees,OU=MIN,OU=People,DC=plansource,DC=local
+    time_format: relative
+  - name: Chris Nimnicht
+    role_id: 1
+    email: Chris.Nimnicht@plansource.com
+    external_id: ldap-CN=Chris Nimnicht,OU=Employees,OU=SLC,OU=People,DC=plansource,DC=local
+    time_format: relative
+  - name: Christian Ullman
+    role_id: 1
+    email: Christian.Ullman@plansource.com
+    external_id: ldap-CN=Christian Ullman,OU=Employees,OU=SLC,OU=People,DC=plansource,DC=local
+    time_format: relative
+  - name: Curt DuPuis
+    role_id: 1
+    email: curt.dupuis@plansource.com
+    external_id: ldap-CN=Curt DuPuis,OU=Remote Office,OU=People,DC=plansource,DC=local
+    time_format: relative
+  - name: Dennis Castello
+    role_id: 1
+    email: Dennis.Castello@plansource.com
+    external_id: ldap-CN=Dennis Castello,OU=Employees,OU=ORL,OU=People,DC=plansource,DC=local
+    time_format: relative
+  - name: Dennis Enos
+    role_id: 1
+    email: Dennis.Enos@plansource.com
+    external_id: ldap-CN=Dennis Enos,OU=Employees,OU=ORL,OU=People,DC=plansource,DC=local
+    time_format: relative
+  - name: Desiree Rodriguez
+    role_id: 1
+    email: desiree.rodriguez@plansource.com
+    external_id: ldap-CN=Desiree Rodriguez,OU=Employees,OU=ORL,OU=People,DC=plansource,DC=local
+    time_format: relative
+  - name: Devin de la Parte
+    role_id: 1
+    email: Devin.delaParte@plansource.com
+    external_id: ldap-CN=Devin de la Parte,OU=Employees,OU=ORL,OU=People,DC=plansource,DC=local
+    time_format: relative
+  - name: Diane Meyer
+    role_id: 1
+    email: Diane.Meyer@plansource.com
+    external_id: ldap-CN=Diane Meyer,OU=Employees,OU=MIN,OU=People,DC=plansource,DC=local
+    time_format: relative
+  - name: Dwight Emmons
+    role_id: 1
+    email: dwight.emmons@plansource.com
+    external_id: ldap-CN=Dwight Emmons,OU=Remote Office,OU=People,DC=plansource,DC=local
+    time_format: relative
+  - name: Edward Kerns
+    role_id: 1
+    email: edward.kerns@plansource.com
+    external_id: ldap-CN=Edward Kerns,OU=Employees,OU=PSPS - NGE,OU=People,DC=plansource,DC=local
+    time_format: relative
+  - name: Eric Copp
+    role_id: 1
+    email: Eric.Copp@plansource.com
+    external_id: ldap-CN=Eric Copp,OU=Employees,OU=SLC,OU=People,DC=plansource,DC=local
+    time_format: relative
+  - name: Eric Parshall
+    role_id: 1
+    email: Eric.Parshall@plansource.com
+    external_id: ldap-CN=Eric Parshall,OU=Employees,OU=SLC,OU=People,DC=plansource,DC=local
+    time_format: relative
+  - name: Frank Ping
+    role_id: 1
+    email: frank.ping@plansource.com
+    external_id: ldap-CN=Frank Ping,OU=Remote Office,OU=People,DC=plansource,DC=local
+    time_format: relative
+  - name: Gerald Nichols
+    role_id: 1
+    email: Gerald.Nichols@plansource.com
+    external_id: ldap-CN=Gerald Nichols,OU=Employees,OU=SLC,OU=People,DC=plansource,DC=local
+    time_format: relative
+  - name: Glenda Szura
+    role_id: 1
+    email: Glenda.Szura@plansource.com
+    external_id: ldap-CN=Glenda Szura,OU=Employees,OU=ORL,OU=People,DC=plansource,DC=local
+    time_format: relative
+  - name: Glenn Sacks
+    role_id: 1
+    email: Glenn.Sacks@plansource.com
+    external_id: ldap-CN=Glenn Sacks,OU=Employees,OU=ORL,OU=People,DC=plansource,DC=local
+    time_format: relative
+  - name: Guario Rodriguez
+    role_id: 1
+    email: Guario.Rodriguez@plansource.com
+    external_id: ldap-CN=Guario Rodriguez,OU=Employees,OU=ORL,OU=People,DC=plansource,DC=local
+    time_format: relative
+  - name: Janish Patel
+    role_id: 1
+    email: janish.patel@plansource.com
+    external_id: ldap-CN=Janish Patel,OU=Remote Office,OU=People,DC=plansource,DC=local
+    time_format: relative
+  - name: Joe Risner
+    role_id: 1
+    email: Joe.Risner@plansource.com
+    external_id: ldap-CN=Joe Risner,OU=Employees,OU=SLC,OU=People,DC=plansource,DC=local
+    time_format: relative
+  - name: Kameron Were
+    role_id: 1
+    email: Kameron.Were@plansource.com
+    external_id: ldap-CN=Kameron Were,OU=Employees,OU=SLC,OU=People,DC=plansource,DC=local
+    time_format: relative
+  - name: Kevin Mellander
+    role_id: 1
+    email: Kevin.Mellander@plansource.com
+    external_id: ldap-CN=Kevin Mellander,OU=Employees,OU=SLC,OU=People,DC=plansource,DC=local
+    time_format: relative
+  - name: Londa Meckes
+    role_id: 1
+    email: Londa.Meckes@plansource.com
+    external_id: ldap-CN=Londa Meckes,OU=Employees,OU=ORL,OU=People,DC=plansource,DC=local
+    time_format: relative
+  - name: Manuel Benavente
+    role_id: 1
+    email: Manuel.Benavente@plansource.com
+    external_id: ldap-CN=Manuel Benavente,OU=Employees,OU=ORL,OU=People,DC=plansource,DC=local
+    time_format: relative
+  - name: Mark Kadlec
+    role_id: 1
+    email: Mark.Kadlec@plansource.com
+    external_id: ldap-CN=Mark Kadlec,OU=Employees,OU=SLC,OU=People,DC=plansource,DC=local
+    time_format: relative
+  - name: Mark Nguyen
+    role_id: 1
+    email: Mark.Nguyen@plansource.com
+    external_id: ldap-CN=Mark Nguyen,OU=Employees,OU=ORL,OU=People,DC=plansource,DC=local
+    time_format: relative
+  - name: Matt Gibbs
+    role_id: 1
+    email: Matt.Gibbs@plansource.com
+    external_id: ldap-CN=Matt Gibbs,OU=Employees,OU=SLC,OU=People,DC=plansource,DC=local
+    time_format: relative
+  - name: Melissa Michaels
+    role_id: 1
+    email: Melissa.Michaels@plansource.com
+    external_id: ldap-CN=Melissa Michaels,OU=Employees,OU=ORL,OU=People,DC=plansource,DC=local
+    time_format: relative
+  - name: Michael Blanco
+    role_id: 1
+    email: Michael.Blanco@plansource.com
+    external_id: ldap-CN=Michael Blanco,OU=Employees,OU=ORL,OU=People,DC=plansource,DC=local
+    time_format: relative
+  - name: Nash Stewart
+    role_id: 1
+    email: Nash.Stewart@plansource.com
+    external_id: ldap-CN=Nash Stewart,OU=Employees,OU=SLC,OU=People,DC=plansource,DC=local
+    time_format: relative
+  - name: Nathan Western
+    role_id: 1
+    email: Nathan.Western@plansource.com
+    external_id: ldap-CN=Nathan Western,OU=Employees,OU=SLC,OU=People,DC=plansource,DC=local
+    time_format: relative
+  - name: Rachel Williams
+    role_id: 1
+    email: Rachel.Williams@plansource.com
+    external_id: ldap-CN=Rachel Williams,OU=Employees,OU=ORL,OU=People,DC=plansource,DC=local
+    time_format: relative
+  - name: Randy See
+    role_id: 1
+    email: Randy.See@plansource.com
+    external_id: ldap-CN=Randy See,OU=Employees,OU=ORL,OU=People,DC=plansource,DC=local
+    time_format: relative
+  - name: Ricardo Valdes
+    role_id: 1
+    email: Ricardo.Valdes@plansource.com
+    external_id: ldap-CN=Ricardo Valdes,OU=Employees,OU=ORL,OU=People,DC=plansource,DC=local
+    time_format: relative
+  - name: Sean Foreman
+    role_id: 1
+    email: Sean.Foreman@plansource.com
+    external_id: ldap-CN=Sean Foreman,OU=Employees,OU=MIN,OU=People,DC=plansource,DC=local
+    time_format: relative
+  - name: Sreenivas Boralingiah
+    role_id: 1
+    email: Sreenivas.Boralingiah@plansource.com
+    external_id: ldap-CN=Sreenivas Boralingiah,OU=Employees,OU=SLC,OU=People,DC=plansource,DC=local
+    time_format: relative
+  - name: Timothy Hunt
+    role_id: 1
+    email: Timothy.Hunt@plansource.com
+    external_id: ldap-CN=Timothy Hunt,OU=Employees,OU=ORL,OU=People,DC=plansource,DC=local
+    time_format: relative
+  - name: Tom Phan
+    role_id: 1
+    email: Tom.Phan@plansource.com
+    external_id: ldap-CN=Tom Phan,OU=Employees,OU=SLC,OU=People,DC=plansource,DC=local
+    time_format: relative
+  - name: Travis Rudisill
+    role_id: 1
+    email: Travis.Rudisill@plansource.com
+    external_id: ldap-CN=Travis Rudisill,OU=Employees,OU=ORL,OU=People,DC=plansource,DC=local
+    time_format: relative
+  - name: Victoria Garrett
+    role_id: 1
+    email: Victoria.Garrett@plansource.com
+    external_id: ldap-CN=Victoria Garrett,OU=Remote Office,OU=People,DC=plansource,DC=local
+    time_format: relative
+  - name: Amanda (Lund) Anderson
+    role_id: 2
+    email: amanda.lund@plansource.com
+    external_id: ldap-CN=Amanda (Lund) Anderson,OU=Employees,OU=SLC,OU=People,DC=plansource,DC=local
+    time_format: relative
+  - name: Chad Broadhead
+    role_id: 2
+    email: Chad.Broadhead@plansource.com
+    external_id: ldap-CN=Chad Broadhead,OU=Employees,OU=SLC,OU=People,DC=plansource,DC=local
+    time_format: relative
+  - name: Dave Horn
+    role_id: 2
+    email: dave.horn@plansource.com
+    external_id: ldap-CN=Dave Horn,OU=Remote Office,OU=People,DC=plansource,DC=local
+    time_format: relative
+  - name: Denis Kadyrko
+    role_id: 2
+    email: denis.kadyrko@plansource.com
+    external_id: ldap-CN=Denis Kadyrko,OU=BelTech,OU=External Clients,OU=People,DC=plansource,DC=local
+    time_format: relative
+  - name: Ellen Mousseau
+    role_id: 2
+    email: Ellen.Mousseau@plansource.com
+    external_id: ldap-CN=Ellen Mousseau,OU=Remote Office,OU=People,DC=plansource,DC=local
+    time_format: relative
+  - name: Eugene Naruta
+    role_id: 2
+    email: Eugene.Naruta@plansource.com
+    external_id: ldap-CN=Eugene Naruta,OU=BelTech,OU=External Clients,OU=People,DC=plansource,DC=local
+    time_format: relative
+  - name: Maksim Shuleika
+    role_id: 2
+    email: Maksim.Shuleika@plansource.com
+    external_id: ldap-CN=Maksim Shuleika,OU=Employees,OU=SLC,OU=People,DC=plansource,DC=local
+    time_format: relative
+  - name: Ryan Baldwin
+    role_id: 2
+    email: ryan.baldwin@plansource.com
+    external_id: ldap-CN=Ryan Baldwin,OU=Employees,OU=SLC,OU=People,DC=plansource,DC=local
+    time_format: relative
+  - name: Sergey Mazur
+    role_id: 2
+    email: Sergey.Mazur@plansource.com
+    external_id: ldap-CN=Sergey Mazur,OU=BelTech,OU=External Clients,OU=People,DC=plansource,DC=local
+    time_format: relative
+  - name: Thomas Leishman
+    role_id: 2
+    email: Thomas.Leishman@plansource.com
+    external_id: ldap-CN=Thomas Leishman,OU=Employees,OU=SLC,OU=People,DC=plansource,DC=local
+    time_format: relative
+  - name: Dan Finn
+    role_id: 3
+    email: Dan.Finn@plansource.com
+    external_id: ldap-CN=Dan Finn,OU=Employees,OU=IT People Accounts,OU=People,DC=plansource,DC=local
+    time_format: relative
+  - name: David Moore
+    role_id: 3
+    email: David.Moore@plansource.com
+    external_id: ldap-CN=David Moore,OU=Employees,OU=IT People Accounts,OU=People,DC=plansource,DC=local
+    time_format: relative
+  - name: Dustin Makepeace
+    role_id: 3
+    email: Dustin.Makepeace@plansource.com
+    external_id: ldap-CN=Dustin Makepeace,OU=Employees,OU=IT People Accounts,OU=People,DC=plansource,DC=local
+    time_format: relative
+  - name: Franck Fallateuf
+    role_id: 3
+    email: franck.fallateuf@plansource.com
+    external_id: ldap-CN=Franck Fallateuf,OU=Employees,OU=IT People Accounts,OU=People,DC=plansource,DC=local
+    time_format: relative
+  - name: Geoff Scott
+    role_id: 3
+    email: Geoff.Scott@plansource.com
+    external_id: ldap-CN=Geoff Scott,OU=Employees,OU=IT People Accounts,OU=People,DC=plansource,DC=local
+    time_format: relative
+  - name: Jason Rutherford
+    role_id: 3
+    email: jason.rutherford@plansource.com
+    external_id: ldap-CN=Jason Rutherford,OU=Remote Office,OU=People,DC=plansource,DC=local
+    time_format: relative
+  - name: Jesse Goerz
+    role_id: 3
+    email: Jesse.Goerz@plansource.com
+    external_id: ldap-CN=Jesse Goerz,OU=Employees,OU=ORL,OU=People,DC=plansource,DC=local
+    time_format: relative

@@ -21,7 +21,7 @@
 /config/database.yml
 
 # Ignore custom setup files (see bin/setup)
-/custom
+# /custom
 
 /node_modules
 
