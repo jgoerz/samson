@@ -61,39 +61,39 @@ fi
 #  "$XYZ_DB_PASSWORD" from a file, especially for Docker's secrets feature)
 # https://docs.docker.com/engine/swarm/secrets/
 file_env() {
-	local var="$1"
-	local fileVar="${var}_FILE"
-	local def="${2:-}"
-	if [ "${!var:-}" ] && [ "${!fileVar:-}" ]; then
-		echo >&2 "error: both $var and $fileVar are set (but are exclusive)"
-		exit 1
-	fi
-	local val="$def"
-	if [ "${!var:-}" ]; then
-		val="${!var}"
-	elif [ "${!fileVar:-}" ]; then
-		val="$(< "${!fileVar}")"
-	fi
-	export "$var"="$val"
-	unset "$fileVar"
+  local var="$1"
+  local fileVar="${var}_FILE"
+  local def="${2:-}"
+  if [ "${!var:-}" ] && [ "${!fileVar:-}" ]; then
+    echo >&2 "error: both $var and $fileVar are set (but are exclusive)"
+    exit 1
+  fi
+  local val="$def"
+  if [ "${!var:-}" ]; then
+    val="${!var}"
+  elif [ "${!fileVar:-}" ]; then
+    val="$(< "${!fileVar}")"
+  fi
+  export "$var"="$val"
+  unset "$fileVar"
 }
 
 file_env 'LDAP_BIND_PASSWORD'
-if [ -z "${LDAP_BIND_PASSWORD}"]; then
+if [ -z "${LDAP_BIND_PASSWORD}" ]; then
   echo >&2 'error: no LDAP_BIND_PASSWORD was specified.'
   echo >&2 'Set LDAP_BIND_PASSWORD_FILE to the file that contains the password.'
   exit 1
 fi
 
-file_env 'DATABASE_USER' 'root'
-if [ -z "${DATABASE_USER}" -a "${RAILS_ENV}" == "production"]; then
+file_env 'DATABASE_USER'
+if [ -z "${DATABASE_USER}" ]; then
   echo >&2 'error: no DATABASE_USER was specified.'
   echo >&2 'Set DATABASE_USER_FILE to the file that contains the username.'
   exit 1
 fi
 
-file_env 'DATABASE_PASSWORD' 'password'
-if [ -z "${DATABASE_PASSWORD}" -a "${RAILS_ENV}" == "production"]; then
+file_env 'DATABASE_PASSWORD'
+if [ -z "${DATABASE_PASSWORD}" ]; then
   echo >&2 'error: no DATABASE_PASSWORD was specified.'
   echo >&2 'Set DATABASE_PASSWORD_FILE to the file that contains the password.'
   exit 1

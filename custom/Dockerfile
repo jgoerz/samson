@@ -1,6 +1,11 @@
+# Build command (from root of repo):
+# docker build -f custom/Dockerfile -t samson:ps-1.0.0 .
+#
 # Run this command to test seeding and problems:
 #
-# docker run --detach --publish 9080:9080 --net=host --dns=10.110.3.220 -v $SSH_AUTH_SOCK:/ssh-agent -e SSH_AUTH_SOCK=/ssh-agent -v $HOME/tmp/phony-home:/home/appuser:ro -u 1000:1000 samson:ps-1.0.0 
+# docker run --detach --publish 9080:9080 --net=host --dns=10.110.3.220 -v $SSH_AUTH_SOCK:/ssh-agent \
+#   -e SSH_AUTH_SOCK=/ssh-agent -v $HOME/docker/samson/home/appuser:ro -e DATABASE_USER=root \
+#   -e DATABASE_PASSWORD=password -u 1000:1000 samson:ps-1.0.0 
 #
 # What args mean:
 # --detach: daemonize
@@ -12,12 +17,12 @@
 # These arguments can be passed into the build as --build-arg UID=XXX --build-arg GID=YYY
 ARG UID=1000
 ARG GID=1000
-ARG RAILS_ENV=development
+# ARG RAILS_ENV=development
 
 FROM ruby:2.4.1-slim
 ARG UID
 ARG GID
-ARG RAILS_ENV
+# ARG RAILS_ENV
 
 RUN apt-get update && apt-get install -y build-essential libmysqlclient-dev libpq-dev libsqlite3-dev wget apt-transport-https git curl \
   && rm -rf /var/lib/apt/lists/*
@@ -44,7 +49,11 @@ COPY vendor/cache /app/vendor/cache
 COPY plugins /app/plugins
 
 # RUN bundle install --quiet --local --jobs 4 || bundle check
-RUN bundle install --with mysql2 --local --jobs 4 || bundle check
+RUN bundle install --with mysql2 --without sqlite postgres --local --jobs 4 || bundle check
+
+# We should be able to use this, but there is something up when I set RAILS_ENV to production that
+# is broken with the env plugin.
+# RUN bundle install --with mysql2 --local --without staging sqlite postgres development test --jobs 4 || bundle check
 
 # Code
 COPY config /app/config
@@ -71,7 +80,7 @@ RUN groupadd -g ${GID} appuser && useradd -r -u ${UID} -g ${GID} appuser \
   && mkdir -p /home/appuser && chmod 0700 /home/appuser \
   && chown -R appuser:appuser /app
 
-ENV RAILS_ENV=${RAILS_ENV}
+# ENV RAILS_ENV=${RAILS_ENV}
 
 USER ${UID}:${GID}
 ENTRYPOINT ["/docker-entrypoint.sh"]
