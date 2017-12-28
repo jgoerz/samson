@@ -23,7 +23,8 @@ describe Kubernetes::Resource do
     }
   end
   let(:deploy_group) { deploy_groups(:pod1) }
-  let(:resource) { Kubernetes::Resource.build(template, deploy_group) }
+  let(:resource) { Kubernetes::Resource.build(template, deploy_group, autoscaled: false) }
+  let(:autoscaled_resource) { Kubernetes::Resource.build(template, deploy_group, autoscaled: true) }
   let(:url) { "http://foobar.server/api/v1/namespaces/pod1/services/some-project" }
   let(:base_url) { File.dirname(url) }
 
@@ -37,7 +38,8 @@ describe Kubernetes::Resource do
 
   describe ".build" do
     it "builds based on kind" do
-      Kubernetes::Resource.build({kind: 'Service'}, deploy_group).class.must_equal Kubernetes::Resource::Service
+      Kubernetes::Resource.build({kind: 'Service'}, deploy_group, autoscaled: false).
+        class.must_equal Kubernetes::Resource::Service
     end
   end
 
@@ -74,7 +76,7 @@ describe Kubernetes::Resource do
     it "updates existing" do
       get = stub_request(:get, url).to_return(body: '{}')
 
-      update = stub_request(:put, url).to_return(body: "{}")
+      update = stub_request(:put, url).with { |x| x.body.must_include '"replicas":2'; true }.to_return(body: "{}")
       resource.deploy
       assert_requested update
 
@@ -82,6 +84,16 @@ describe Kubernetes::Resource do
       assert resource.running?
       assert resource.running?
       assert_requested get, times: 2
+    end
+
+    it "keeps replicase when autoscaled, to not revert autoscaler changes" do
+      get = stub_request(:get, url).to_return(body: {spec: {replicas: 5}}.to_json)
+      update = stub_request(:put, url).with { |x| x.body.must_include '"replicas":5'; true }.to_return(body: "{}")
+
+      autoscaled_resource.deploy
+
+      assert_requested update
+      assert_requested get
     end
 
     it "shows errors to users when resource was invalid" do
@@ -176,6 +188,23 @@ describe Kubernetes::Resource do
     it "is not primary when it is a secondary resource" do
       template[:kind] = "Service"
       refute resource.primary?
+    end
+  end
+
+  describe "#desired_pod_count" do
+    it "reads the value from config" do
+      template[:spec] = {replicas: 3}
+      resource.desired_pod_count.must_equal 3
+    end
+
+    it "expects a constant number of pods when using autoscaling" do
+      stub_request(:get, url).to_return(body: {spec: {replicas: 4}}.to_json)
+      autoscaled_resource.desired_pod_count.must_equal 4
+    end
+
+    it "uses template amount when creating with autoscaling" do
+      stub_request(:get, url).to_return(status: 404)
+      autoscaled_resource.desired_pod_count.must_equal 2
     end
   end
 
@@ -358,13 +387,6 @@ describe Kubernetes::Resource do
         resource.revert(nil)
       end
     end
-
-    describe "#desired_pod_count" do
-      it "reads the value from config" do
-        template[:spec] = {replicas: 3}
-        resource.desired_pod_count.must_equal 3
-      end
-    end
   end
 
   describe Kubernetes::Resource::StatefulSet do
@@ -381,13 +403,6 @@ describe Kubernetes::Resource do
     describe "#client" do
       it "uses the apps client because it is in beta" do
         resource.send(:client).must_equal deploy_group.kubernetes_cluster.apps_client
-      end
-    end
-
-    describe "#desired_pod_count" do
-      it "reads the value from config" do
-        template[:spec] = {replicas: 3}
-        resource.desired_pod_count.must_equal 3
       end
     end
 
@@ -472,13 +487,6 @@ describe Kubernetes::Resource do
       end
     end
 
-    describe "#desired_pod_count" do
-      it "reads the value from config" do
-        template[:spec] = {replicas: 3}
-        resource.desired_pod_count.must_equal 3
-      end
-    end
-
     describe "#revert" do
       it "deletes with previous version since job is already done" do
         resource.expects(:delete)
@@ -494,6 +502,15 @@ describe Kubernetes::Resource do
 
   describe Kubernetes::Resource::Service do
     describe "#deploy" do
+      let(:old) { {metadata: {resourceVersion: "A", foo: "B"}, spec: {clusterIP: "C"}} }
+      let(:expected_body) do
+        {
+          kind: "Service",
+          metadata: {name: "some-project", namespace: "pod1", resourceVersion: "A"},
+          spec: {replicas: 2, template: {spec: {containers: [{image: "bar"}]}}, clusterIP: "C"}
+        }
+      end
+
       it "creates when missing" do
         stub_request(:get, url).to_return(status: 404)
 
@@ -502,21 +519,37 @@ describe Kubernetes::Resource do
         assert_requested request
       end
 
-      it "does not update existing because that is not supported" do
-        stub_request(:get, url).to_return(body: '{}')
-
+      it "replaces existing while keeping fields that kubernetes demands" do
+        stub_request(:get, url).to_return(body: old.to_json)
+        stub_request(:put, url).with(body: expected_body.to_json)
         resource.deploy
       end
-    end
 
-    describe "#revert" do
-      it "leaves previous version since we cannot update" do
-        resource.revert(foo: :bar)
+      it "keeps whitelisted fields" do
+        with_env KUBERNETES_SERVICE_PERSISTENT_FIELDS: "metadata.foo" do
+          stub_request(:get, url).to_return(body: old.to_json)
+          stub_request(:put, url).with(body: expected_body.deep_merge(metadata: {foo: "B"}).to_json)
+          resource.deploy
+        end
       end
 
-      it "deletes when there was no previous version" do
-        resource.expects(:delete)
-        resource.revert(nil)
+      it "ignores unknown whitelisted fields" do
+        with_env KUBERNETES_SERVICE_PERSISTENT_FIELDS: "metadata.nope" do
+          stub_request(:get, url).to_return(body: old.to_json)
+          stub_request(:put, url).with(body: expected_body.to_json)
+          resource.deploy
+        end
+      end
+
+      it "allows adding whitelisted fields" do
+        with_env KUBERNETES_SERVICE_PERSISTENT_FIELDS: "metadata.nope" do
+          template[:metadata][:nope] = "X"
+          stub_request(:get, url).to_return(body: old.to_json)
+          expected_body[:metadata][:nope] = "X"
+          expected_body[:metadata][:resourceVersion] = expected_body[:metadata].delete(:resourceVersion) # has ordering
+          stub_request(:put, url).with(body: expected_body.to_json)
+          resource.deploy
+        end
       end
     end
   end
