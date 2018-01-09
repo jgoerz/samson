@@ -16,6 +16,16 @@ puts "Seeding with custom data"
 
 data = YAML.safe_load(File.read('custom/seeds.yml'))
 
+# Global Commands
+if data.key?('commands')
+  data['commands'].each_with_index do |command, index|
+    cmd = Command.create!(
+        command: command['command']
+    )
+    data['commands'][index]['id'] = cmd.id
+  end
+end
+
 # Load projects, and their stages and commands.
 if data.key?('projects')
   data['projects'].each do |project|
@@ -26,13 +36,56 @@ if data.key?('projects')
 
     if project.key?('stages')
       project['stages'].each do |stage|
-        p_obj.stages.create!(
+        s_obj = p_obj.stages.create!(
           name: stage['name'],
           production: stage['production'],
           cancel_queued_deploys: stage['cancel_queued_deploys']
         )
-      end
-    end
+
+        # Create default stage scripts, basically a join table of stages and commands with position
+        # parameter to show sequence of commands.  There are currently 8 steps to each sequence if
+        # they use _all_ the "template" commands.
+        if stage.key?('do_stage_commands') && stage['do_stage_commands'] != false
+          position = 1
+          1.upto(8) do |meta_order|
+            result = data['commands'].select{|c| c["meta_order"] == meta_order}
+
+            next if (result.first['meta_env'] == 'ps-spyder') && (stage['cmd_uses_ps_spyder'] != true)
+            next if (result.first['meta_env'] == 'shared-gems') && (stage['cmd_uses_shared_gems'] != true)
+
+            if result.count == 0
+              raise StandardError.new("No commands in seeds file with 'meta_order' field?")
+
+            elsif result.count == 1
+              StageCommand.create!(command_id: result.first['id'], stage: s_obj, position: position)
+
+            else
+              cmd = nil
+              if result.first['meta_env'] =~ /^branch,/ # Super ewww!
+                cmd = result.select do |c| 
+                  not_used, *branches = *c['meta_env'].split(',') 
+                  branches.any? do |branch|
+                    "#{stage['cmd_meta_env']}" =~ Regexp.new("#{branch}|#{branch}-utllity")
+                  end
+                end
+                cmd = cmd.first
+              else
+                cmd = result.select{|c| c['meta_env'] == stage['cmd_meta_env']}.first
+              end
+              cmd = cmd.nil? ? {} : cmd
+
+              next if (cmd['meta_env'] == 'ps-spyder') && (stage['cmd_uses_ps_spyder'] != true)
+              next if (cmd['meta_env'] == 'shared-gems') && (stage['cmd_uses_shared_gems'] != true)
+
+              StageCommand.create!(command_id: cmd['id'], stage: s_obj, position: position)
+            end
+
+            position += 1
+          end
+        end # stage_commands
+
+      end # stages
+    end # stages exist
 
     # per project commands
     if project.key?('commands')
@@ -62,11 +115,4 @@ if data.key?('users')
   end
 end
 
-# Global Commands
-if data.key?('commands')
-  data['commands'].each do |command|
-    Command.create!(
-        command: command['command']
-    )
-  end
-end
+
