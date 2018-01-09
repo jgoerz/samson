@@ -6,59 +6,151 @@ projects:
       - name: DEV Apps
         production: false
         cancel_queued_deploys: true
+        cmd_meta_env: dev
+        cmd_uses_shared_gems: true
+        cmd_uses_ps_spyder: true
+        do_stage_commands: true
       - name: DEV Utility
         production: false
         cancel_queued_deploys: true
+        cmd_meta_env: dev-utility
+        cmd_uses_shared_gems: true
+        cmd_uses_ps_spyder: true
+        do_stage_commands: true
       - name: Partner DEV Apps
         production: false
         cancel_queued_deploys: true
+        cmd_meta_env: partner-dev
+        cmd_uses_shared_gems: true
+        cmd_uses_ps_spyder: true
+        do_stage_commands: true
       - name: Partner DEV Utility
         production: false
         cancel_queued_deploys: true
+        cmd_meta_env: partner-dev-utility
+        cmd_uses_shared_gems: true
+        cmd_uses_ps_spyder: true
+        do_stage_commands: true
       - name: UAT Apps
         production: false
         cancel_queued_deploys: true
+        cmd_meta_env: uat
+        cmd_uses_shared_gems: true
+        cmd_uses_ps_spyder: true
+        do_stage_commands: true
       - name: UAT Utility
         production: false
         cancel_queued_deploys: true
+        cmd_meta_env: uat-utility
+        cmd_uses_shared_gems: true
+        cmd_uses_ps_spyder: true
+        do_stage_commands: true
       - name: RC Apps
         production: false
         cancel_queued_deploys: true
+        cmd_meta_env: rc
+        cmd_uses_shared_gems: true
+        cmd_uses_ps_spyder: true
+        do_stage_commands: true
       - name: RC Utility
         production: false
         cancel_queued_deploys: true
-    commands:
-      - command: 'echo "test"'
+        cmd_meta_env: rc-utility
+        cmd_uses_shared_gems: true
+        cmd_uses_ps_spyder: true
+        do_stage_commands: true
+      - name: Cycle Server RC
+        production: false
+        cancel_queued_deploys: true
+        cmd_meta_env: cycle-rc
+        cmd_uses_shared_gems: true
+        cmd_uses_ps_spyder: true
+        do_stage_commands: true
+      - name: Cycle Server Master
+        production: false
+        cancel_queued_deploys: true
+        cmd_meta_env: cycle-master
+        cmd_uses_shared_gems: true
+        cmd_uses_ps_spyder: true
+        do_stage_commands: true
   - name: Broker Application
     repository_url: "git@git.plansource.com:app/broker.git"
     stages:
       - name: DEV Apps
         production: false
         cancel_queued_deploys: true
+        cmd_meta_env: dev
+        cmd_uses_shared_gems: true
+        do_stage_commands: true
       - name: Partner DEV Apps
         production: false
         cancel_queued_deploys: true
+        cmd_meta_env: partner-dev
+        cmd_uses_shared_gems: true
+        do_stage_commands: true
       - name: UAT Apps
         production: false
         cancel_queued_deploys: true
+        cmd_meta_env: uat
+        cmd_uses_shared_gems: true
+        do_stage_commands: true
       - name: RC Apps
         production: false
         cancel_queued_deploys: true
+        cmd_meta_env: rc
+        cmd_uses_shared_gems: true
+        do_stage_commands: true
+      - name: Cycle Server RC
+        production: false
+        cancel_queued_deploys: true
+        cmd_meta_env: cycle-rc
+        cmd_uses_shared_gems: true
+        do_stage_commands: true
+      - name: Cycle Server Master
+        production: false
+        cancel_queued_deploys: true
+        cmd_meta_env: cycle-master
+        cmd_uses_shared_gems: true
+        do_stage_commands: true
   - name: Admin Application
     repository_url: "git@git.plansource.com:app/admin.git"
     stages:
       - name: DEV Apps
         production: false
         cancel_queued_deploys: true
+        cmd_meta_env: dev
+        cmd_uses_shared_gems: true
+        do_stage_commands: true
       - name: Partner DEV Apps
         production: false
         cancel_queued_deploys: true
+        cmd_meta_env: partner-dev
+        cmd_uses_shared_gems: true
+        do_stage_commands: true
       - name: UAT Apps
         production: false
         cancel_queued_deploys: true
+        cmd_meta_env: uat
+        cmd_uses_shared_gems: true
+        do_stage_commands: true
       - name: RC Apps
         production: false
         cancel_queued_deploys: true
+        cmd_meta_env: rc
+        cmd_uses_shared_gems: true
+        do_stage_commands: true
+      - name: Cycle Server RC
+        production: false
+        cancel_queued_deploys: true
+        cmd_meta_env: cycle-rc
+        cmd_uses_shared_gems: true
+        do_stage_commands: true
+      - name: Cycle Server Master
+        production: false
+        cancel_queued_deploys: true
+        cmd_meta_env: cycle-master
+        cmd_uses_shared_gems: true
+        do_stage_commands: true
   - name: Carrier Application
     repository_url: "git@git.plansource.com:app/carrier.git"
     stages:
@@ -79,81 +171,199 @@ projects:
         cancel_queued_deploys: true
         project: Carrier Application
 commands:
-  - command: "sed -e '/set :create_git_tag, true/ s/^#*/#/' -i config/deploy/development.rb'"
+  - command: |2
+      # This should not be necessary in a container.
+      export PATH=/usr/local/rvm/gems/ruby-2.4.1/bin:/usr/local/rvm/gems/ruby-2.4.1:/usr/local/rvm/rubies/ruby-2.4.1/bin:/usr/local/rvm/gems/ruby-2.4.1/bin:"$PATH"
+      export rvm_path=/usr/local/rvm
+      export rvm_prefix=/usr/local
+      export rvm_bin_path=/usr/local/rvm/gems/ruby-2.4.1/bin
+      export GEM_PATH=/usr/local/rvm/gems/ruby-2.4.1
+      export GEM_HOME=/usr/local/rvm/gems/ruby-2.4.1
     project:
-  - command: "sed -e '/set :create_git_tag, true/ s/^#*/#/' -i config/deploy/development-utility.rb'"
-    project:
-  - command: "sed -e '/set :create_git_tag, true/ s/^#*/#/' -i config/deploy/uat.rb'"
-    project:
-  - command: "sed -e '/set :create_git_tag, true/ s/^#*/#/' -i config/deploy/uat-utility.rb'"
-    project:
-  - command: "sed -e '/set :create_git_tag, true/ s/^#*/#/' -i config/deploy/rc.rb'"
-    project:
-  - command: "sed -e '/set :create_git_tag, true/ s/^#*/#/' -i config/deploy/rc-utility.rb'"
-    project:
-  - command: "sed -e '/set :create_git_tag, true/ s/^#*/#/' -i config/deploy/partner-dev.rb'"
-    project:
-  - command: "sed -e '/set :create_git_tag, true/ s/^#*/#/' -i config/deploy/partner-dev-utility.rb'"
-    project:
+    id: 0
+    meta_env: all
+    meta_order: 1
   - command: 'export STAGE_NAME="development"'
     project:
+    id: 0
+    meta_env: dev
+    meta_order: 2
   - command: 'export STAGE_NAME="development-utility"'
     project:
+    id: 0
+    meta_env: dev-utility
+    meta_order: 2
+  - command: 'export STAGE_NAME="partner-dev"'
+    project:
+    id: 0
+    meta_env: partner-dev
+    meta_order: 2
+  - command: 'export STAGE_NAME="partner-dev-utility"'
+    project:
+    id: 0
+    meta_env: partner-dev-utility
+    meta_order: 2
+  - command: 'export STAGE_NAME="uat"'
+    project:
+    id: 0
+    meta_env: uat
+    meta_order: 2
+  - command: 'export STAGE_NAME="uat-utility"'
+    project:
+    id: 0
+    meta_env: uat-utility
+    meta_order: 2
+  - command: 'export STAGE_NAME="rc"'
+    project:
+    id: 0
+    meta_env: rc
+    meta_order: 2
+  - command: 'export STAGE_NAME="rc-utility"'
+    project:
+    id: 0
+    meta_env: rc-utility
+    meta_order: 2
+  - command: 'export STAGE_NAME="cycle-rc"'
+    project:
+    id: 0
+    meta_env: cycle-rc
+    meta_order: 2
+  - command: 'export STAGE_NAME="cycle-master"'
+    project:
+    id: 0
+    meta_env: cycle-master
+    meta_order: 2
   - command: 'export STAGE_DEFAULT_BRANCH="develop"'
     project:
+    id: 0
+    meta_env: branch,dev,uat,partner-dev
+    meta_order: 3
   - command: 'export STAGE_DEFAULT_BRANCH="rc-patches"'
     project:
-  - command: |2
-        # Create or update PsSypder
-        # $STAGE_DEFAULT_BRANCH needs to be set
-        if [ -d ../gems/ps_spyder ]; then
-          : # nop
-        else
-          mkdir -p ../gems
-          git clone git@git.plansource.com:gem/ps_spyder.git ../gems/ps_spyder
-        fi
-        cd ../gems/ps_spyder
-        git checkout $STAGE_DEFAULT_BRANCH
-        git pull
-        cd -
+    id: 0
+    meta_env: branch,rc,cycle-rc
+    meta_order: 3
+  - command: 'export STAGE_DEFAULT_BRANCH="master"'
     project:
+    id: 0
+    meta_env: branch,cycle-master
+    meta_order: 3
+  - command: 'export DEPLOY_USER="deployer"'
+    project:
+    id: 0
+    meta_env: all
+    meta_order: 4
+  - command: "sed -e '/set :create_git_tag, true/ s/^#*/#/' -i config/deploy/development.rb"
+    project:
+    id: 0
+    meta_env: dev
+    meta_order: 5
+  - command: "sed -e '/set :create_git_tag, true/ s/^#*/#/' -i config/deploy/development-utility.rb"
+    project:
+    id: 0
+    meta_env: dev-utility
+    meta_order: 5
+  - command: "sed -e '/set :create_git_tag, true/ s/^#*/#/' -i config/deploy/partner-dev.rb"
+    project:
+    id: 0
+    meta_env: partner-dev
+    meta_order: 5
+  - command: "sed -e '/set :create_git_tag, true/ s/^#*/#/' -i config/deploy/partner-dev-utility.rb"
+    project:
+    id: 0
+    meta_env: partner-dev-utility
+    meta_order: 5
+  - command: "sed -e '/set :create_git_tag, true/ s/^#*/#/' -i config/deploy/uat.rb"
+    project:
+    id: 0
+    meta_env: uat
+    meta_order: 5
+  - command: "sed -e '/set :create_git_tag, true/ s/^#*/#/' -i config/deploy/uat-utility.rb"
+    project:
+    id: 0
+    meta_env: uat-utility
+    meta_order: 5
+  - command: "sed -e '/set :create_git_tag, true/ s/^#*/#/' -i config/deploy/rc.rb"
+    project:
+    id: 0
+    meta_env: rc
+    meta_order: 5
+  - command: "sed -e '/set :create_git_tag, true/ s/^#*/#/' -i config/deploy/rc-utility.rb"
+    project:
+    id: 0
+    meta_env: rc-utility
+    meta_order: 5
+  - command: "sed -e '/set :create_git_tag, true/ s/^#*/#/' -i config/deploy/cycle-rc.rb"
+    project:
+    id: 0
+    meta_env: cycle-rc
+    meta_order: 5
+  - command: "sed -e '/set :create_git_tag, true/ s/^#*/#/' -i config/deploy/cycle-master.rb"
+    project:
+    id: 0
+    meta_env: cycle-master
+    meta_order: 5
   - command: |2
-        # Create or update GEMS
-        # $STAGE_DEFAULT_BRANCH needs to be set
-        if [ -d ../gems/ps-shared ]; then
-          : # nop
-        else
-          mkdir -p ../gems
-          git clone git@git.plansource.com:app/ps-shared.git ../gems/ps-shared
-        fi
-        cd ../gems/ps-shared
-        git checkout $STAGE_DEFAULT_BRANCH
-        git pull
-        cd -
+      # Create or update GEMS
+      # $STAGE_DEFAULT_BRANCH needs to be set
+      if [ -d ../gems/ps-shared ]; then
+        : # nop
+      else
+        mkdir -p ../gems
+        git clone git@git.plansource.com:app/ps-shared.git ../gems/ps-shared
+      fi
+      cd ../gems/ps-shared
+      git checkout $STAGE_DEFAULT_BRANCH
+      git pull
+      cd -
 
-        if [ -d ../gems/ps-shared-assets ]; then
-          : # nop
-        else
-          mkdir -p ../gems
-          git clone git@git.plansource.com:app/ps-shared-assets.git ../gems/ps-shared-assets
-        fi
-        cd ../gems/ps-shared-assets
-        git checkout $STAGE_DEFAULT_BRANCH
-        git pull
-        cd -
+      if [ -d ../gems/ps-shared-assets ]; then
+        : # nop
+      else
+        mkdir -p ../gems
+        git clone git@git.plansource.com:app/ps-shared-assets.git ../gems/ps-shared-assets
+      fi
+      cd ../gems/ps-shared-assets
+      git checkout $STAGE_DEFAULT_BRANCH
+      git pull
+      cd -
     project:
+    id: 0
+    meta_env: shared-gems
+    meta_order: 6
   - command: |2
-        # Bundles and deploys your project
-        # $STAGE_NAME needs to be set
-        if [ -d vendor/cache ]; then BUNDLE_ARGS="--local"; else BUNDLE_ARGS=""; fi
-        bundle install $BUNDLE_ARGS --jobs 4 --without test --path $CACHE_DIR/bundle --quiet
-        bundle exec cap $STAGE_NAME deploy --trace
-    project: not set
+      # Create or update PsSypder
+      # $STAGE_DEFAULT_BRANCH needs to be set
+      if [ -d ../gems/ps_spyder ]; then
+        : # nop
+      else
+        mkdir -p ../gems
+        git clone git@git.plansource.com:gem/ps_spyder.git ../gems/ps_spyder
+      fi
+      cd ../gems/ps_spyder
+      git checkout $STAGE_DEFAULT_BRANCH
+      git pull
+      cd -
+    project:
+    id: 0
+    meta_env: ps-spyder
+    meta_order: 7
+  - command: |2
+      # Bundles and deploys your project
+      # $STAGE_NAME needs to be set
+      if [ -d vendor/cache ]; then BUNDLE_ARGS="--local"; else BUNDLE_ARGS=""; fi
+      bundle install $BUNDLE_ARGS --jobs 4 --without test --path $CACHE_DIR/bundle --quiet
+      bundle exec cap $STAGE_NAME deploy --trace
+    project:
+    id: 0
+    meta_env: all
+    meta_order: 8
   - command: |2
         ruby --version
         gem list
         gem env
-    project: not set
+    project:
+    id: 0
 users:
   - name: Anooj Rajan
     role_id: 1
