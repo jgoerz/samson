@@ -313,7 +313,7 @@ commands:
         git clone git@git.plansource.com:app/ps-shared.git ../gems/ps-shared
       fi
       cd ../gems/ps-shared
-      git checkout $STAGE_DEFAULT_BRANCH
+      git checkout --force $STAGE_DEFAULT_BRANCH
       git pull
       cd -
 
@@ -324,7 +324,7 @@ commands:
         git clone git@git.plansource.com:app/ps-shared-assets.git ../gems/ps-shared-assets
       fi
       cd ../gems/ps-shared-assets
-      git checkout $STAGE_DEFAULT_BRANCH
+      git checkout --force $STAGE_DEFAULT_BRANCH
       git pull
       cd -
     project:
@@ -341,7 +341,7 @@ commands:
         git clone git@git.plansource.com:gem/ps_spyder.git ../gems/ps_spyder
       fi
       cd ../gems/ps_spyder
-      git checkout $STAGE_DEFAULT_BRANCH
+      git checkout --force $STAGE_DEFAULT_BRANCH
       git pull
       cd -
     project:
