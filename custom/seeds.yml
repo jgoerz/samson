@@ -158,6 +158,9 @@ projects:
         production: false
         cancel_queued_deploys: true
         project: Carrier Application
+        cmd_meta_env: dev
+        cmd_uses_shared_gems: true
+        do_stage_commands: true
       - name: Partner DEV Apps
         production: false
         cancel_queued_deploys: true
@@ -166,6 +169,9 @@ projects:
         production: false
         cancel_queued_deploys: true
         project: Carrier Application
+        cmd_meta_env: dev
+        cmd_uses_shared_gems: true
+        do_stage_commands: true
       - name: RC Apps
         production: false
         cancel_queued_deploys: true
