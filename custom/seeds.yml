@@ -7,71 +7,51 @@ projects:
         production: false
         cancel_queued_deploys: true
         cmd_meta_env: dev
-        cmd_uses_shared_gems: true
-        cmd_uses_ps_spyder: true
         do_stage_commands: true
       - name: DEV Utility
         production: false
         cancel_queued_deploys: true
         cmd_meta_env: dev-utility
-        cmd_uses_shared_gems: true
-        cmd_uses_ps_spyder: true
         do_stage_commands: true
       - name: Partner DEV Apps
         production: false
         cancel_queued_deploys: true
         cmd_meta_env: partner-dev
-        cmd_uses_shared_gems: true
-        cmd_uses_ps_spyder: true
         do_stage_commands: true
       - name: Partner DEV Utility
         production: false
         cancel_queued_deploys: true
         cmd_meta_env: partner-dev-utility
-        cmd_uses_shared_gems: true
-        cmd_uses_ps_spyder: true
         do_stage_commands: true
       - name: UAT Apps
         production: false
         cancel_queued_deploys: true
         cmd_meta_env: uat
-        cmd_uses_shared_gems: true
-        cmd_uses_ps_spyder: true
         do_stage_commands: true
       - name: UAT Utility
         production: false
         cancel_queued_deploys: true
         cmd_meta_env: uat-utility
-        cmd_uses_shared_gems: true
-        cmd_uses_ps_spyder: true
         do_stage_commands: true
       - name: RC Apps
         production: false
         cancel_queued_deploys: true
         cmd_meta_env: rc
-        cmd_uses_shared_gems: true
-        cmd_uses_ps_spyder: true
         do_stage_commands: true
       - name: RC Utility
         production: false
         cancel_queued_deploys: true
         cmd_meta_env: rc-utility
-        cmd_uses_shared_gems: true
-        cmd_uses_ps_spyder: true
         do_stage_commands: true
       - name: Cycle Server RC
         production: false
         cancel_queued_deploys: true
         cmd_meta_env: cycle-rc
-        cmd_uses_shared_gems: true
-        cmd_uses_ps_spyder: true
         do_stage_commands: true
       - name: Cycle Server Master
         production: false
         cancel_queued_deploys: true
         cmd_meta_env: cycle-master
-        cmd_uses_shared_gems: true
-        cmd_uses_ps_spyder: true
         do_stage_commands: true
   - name: Broker Application
     repository_url: "git@git.plansource.com:app/broker.git"
@@ -80,38 +60,26 @@ projects:
         production: false
         cancel_queued_deploys: true
         cmd_meta_env: dev
-        cmd_uses_shared_gems: true
-        do_stage_commands: true
       - name: Partner DEV Apps
         production: false
         cancel_queued_deploys: true
         cmd_meta_env: partner-dev
-        cmd_uses_shared_gems: true
-        do_stage_commands: true
       - name: UAT Apps
         production: false
         cancel_queued_deploys: true
         cmd_meta_env: uat
-        cmd_uses_shared_gems: true
-        do_stage_commands: true
       - name: RC Apps
         production: false
         cancel_queued_deploys: true
         cmd_meta_env: rc
-        cmd_uses_shared_gems: true
-        do_stage_commands: true
       - name: Cycle Server RC
         production: false
         cancel_queued_deploys: true
         cmd_meta_env: cycle-rc
-        cmd_uses_shared_gems: true
-        do_stage_commands: true
       - name: Cycle Server Master
         production: false
         cancel_queued_deploys: true
         cmd_meta_env: cycle-master
-        cmd_uses_shared_gems: true
-        do_stage_commands: true
   - name: Admin Application
     repository_url: "git@git.plansource.com:app/admin.git"
     stages:
@@ -119,38 +87,26 @@ projects:
         production: false
         cancel_queued_deploys: true
         cmd_meta_env: dev
-        cmd_uses_shared_gems: true
-        do_stage_commands: true
       - name: Partner DEV Apps
         production: false
         cancel_queued_deploys: true
         cmd_meta_env: partner-dev
-        cmd_uses_shared_gems: true
-        do_stage_commands: true
       - name: UAT Apps
         production: false
         cancel_queued_deploys: true
         cmd_meta_env: uat
-        cmd_uses_shared_gems: true
-        do_stage_commands: true
       - name: RC Apps
         production: false
         cancel_queued_deploys: true
         cmd_meta_env: rc
-        cmd_uses_shared_gems: true
-        do_stage_commands: true
       - name: Cycle Server RC
         production: false
         cancel_queued_deploys: true
         cmd_meta_env: cycle-rc
-        cmd_uses_shared_gems: true
-        do_stage_commands: true
       - name: Cycle Server Master
         production: false
         cancel_queued_deploys: true
         cmd_meta_env: cycle-master
-        cmd_uses_shared_gems: true
-        do_stage_commands: true
   - name: Carrier Application
     repository_url: "git@git.plansource.com:app/carrier.git"
     stages:
@@ -159,8 +115,6 @@ projects:
         cancel_queued_deploys: true
         project: Carrier Application
         cmd_meta_env: dev
-        cmd_uses_shared_gems: true
-        do_stage_commands: true
       - name: Partner DEV Apps
         production: false
         cancel_queued_deploys: true
@@ -170,8 +124,6 @@ projects:
         cancel_queued_deploys: true
         project: Carrier Application
         cmd_meta_env: dev
-        cmd_uses_shared_gems: true
-        do_stage_commands: true
       - name: RC Apps
         production: false
         cancel_queued_deploys: true
@@ -310,52 +262,18 @@ commands:
     meta_env: cycle-master
     meta_order: 5
   - command: |2
-      # Create or update GEMS
-      # $STAGE_DEFAULT_BRANCH needs to be set
-      if [ -d ../gems/ps-shared ]; then
-        : # nop
-      else
-        mkdir -p ../gems
-        git clone git@git.plansource.com:app/ps-shared.git ../gems/ps-shared
-      fi
-      cd ../gems/ps-shared
-      git checkout --force $STAGE_DEFAULT_BRANCH
-      git pull
-      cd -
-
-      if [ -d ../gems/ps-shared-assets ]; then
-        : # nop
-      else
-        mkdir -p ../gems
-        git clone git@git.plansource.com:app/ps-shared-assets.git ../gems/ps-shared-assets
-      fi
-      cd ../gems/ps-shared-assets
-      git checkout --force $STAGE_DEFAULT_BRANCH
-      git pull
-      cd -
+      # Grab ps-shared, ps-shared-assets, and ps_spyder from the git repo instead of local directories.
+      # Basically does ps-deploy-helper:gemfile_replace locally.
+      # STAGE_DEFAULT_BRANCH needs to be set.
+      sed -i "s#^gem[ \t]\+\(\x22\|'\)ps_shared\(\x22\|'\).*#gem 'ps_shared', git: 'git@git.plansource.com:app/ps-shared.git', branch: '$STAGE_DEFAULT_BRANCH'#" Gemfile
+      sed -i "s#^gem[ \t]\+\(\x22\|'\)ps_shared_assets\(\x22\|'\).*#gem 'ps_shared_assets', git: 'git@git.plansource.com:app/ps-shared-assets.git', branch: '$STAGE_DEFAULT_BRANCH'#" Gemfile
+      sed -i "s#^gem[ \t]\+\(\x22\|'\)ps_spyder\(\x22\|'\).*#gem 'ps_spyder', git: 'git@git.plansource.com:gem/ps_spyder.git', branch: '$STAGE_DEFAULT_BRANCH'#" Gemfile
     project:
     id: 0
-    meta_env: shared-gems
+    meta_env: all
     meta_order: 6
   - command: |2
-      # Create or update PsSypder
-      # $STAGE_DEFAULT_BRANCH needs to be set
-      if [ -d ../gems/ps_spyder ]; then
-        : # nop
-      else
-        mkdir -p ../gems
-        git clone git@git.plansource.com:gem/ps_spyder.git ../gems/ps_spyder
-      fi
-      cd ../gems/ps_spyder
-      git checkout --force $STAGE_DEFAULT_BRANCH
-      git pull
-      cd -
-    project:
-    id: 0
-    meta_env: ps-spyder
-    meta_order: 7
-  - command: |2
-      # Bundles and deploys your project
+      # Bundles and deploys the project
       # $STAGE_NAME needs to be set
       if [ -d vendor/cache ]; then BUNDLE_ARGS="--local"; else BUNDLE_ARGS=""; fi
       bundle install $BUNDLE_ARGS --jobs 4 --without test --path $CACHE_DIR/bundle --quiet
@@ -363,7 +281,7 @@ commands:
     project:
     id: 0
     meta_env: all
-    meta_order: 8
+    meta_order: 7
   - command: |2
         ruby --version
         gem list

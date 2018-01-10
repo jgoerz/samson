@@ -47,11 +47,8 @@ if data.key?('projects')
         # they use _all_ the "template" commands.
         if stage.key?('do_stage_commands') && stage['do_stage_commands'] != false
           position = 1
-          1.upto(8) do |meta_order|
+          1.upto(7) do |meta_order|
             result = data['commands'].select{|c| c["meta_order"] == meta_order}
-
-            next if (result.first['meta_env'] == 'ps-spyder') && (stage['cmd_uses_ps_spyder'] != true)
-            next if (result.first['meta_env'] == 'shared-gems') && (stage['cmd_uses_shared_gems'] != true)
 
             if result.count == 0
               raise StandardError.new("No commands in seeds file with 'meta_order' field?")
@@ -73,9 +70,6 @@ if data.key?('projects')
                 cmd = result.select{|c| c['meta_env'] == stage['cmd_meta_env']}.first
               end
               cmd = cmd.nil? ? {} : cmd
-
-              next if (cmd['meta_env'] == 'ps-spyder') && (stage['cmd_uses_ps_spyder'] != true)
-              next if (cmd['meta_env'] == 'shared-gems') && (stage['cmd_uses_shared_gems'] != true)
 
               StageCommand.create!(command_id: cmd['id'], stage: s_obj, position: position)
             end
