@@ -60,26 +60,32 @@ projects:
         production: false
         cancel_queued_deploys: true
         cmd_meta_env: dev
+        do_stage_commands: true
       - name: Partner DEV Apps
         production: false
         cancel_queued_deploys: true
         cmd_meta_env: partner-dev
+        do_stage_commands: true
       - name: UAT Apps
         production: false
         cancel_queued_deploys: true
         cmd_meta_env: uat
+        do_stage_commands: true
       - name: RC Apps
         production: false
         cancel_queued_deploys: true
         cmd_meta_env: rc
+        do_stage_commands: true
       - name: Cycle Server RC
         production: false
         cancel_queued_deploys: true
         cmd_meta_env: cycle-rc
+        do_stage_commands: true
       - name: Cycle Server Master
         production: false
         cancel_queued_deploys: true
         cmd_meta_env: cycle-master
+        do_stage_commands: true
   - name: Admin Application
     repository_url: "git@git.plansource.com:app/admin.git"
     stages:
@@ -87,26 +93,32 @@ projects:
         production: false
         cancel_queued_deploys: true
         cmd_meta_env: dev
+        do_stage_commands: true
       - name: Partner DEV Apps
         production: false
         cancel_queued_deploys: true
         cmd_meta_env: partner-dev
+        do_stage_commands: true
       - name: UAT Apps
         production: false
         cancel_queued_deploys: true
         cmd_meta_env: uat
+        do_stage_commands: true
       - name: RC Apps
         production: false
         cancel_queued_deploys: true
         cmd_meta_env: rc
+        do_stage_commands: true
       - name: Cycle Server RC
         production: false
         cancel_queued_deploys: true
         cmd_meta_env: cycle-rc
+        do_stage_commands: true
       - name: Cycle Server Master
         production: false
         cancel_queued_deploys: true
         cmd_meta_env: cycle-master
+        do_stage_commands: true
   - name: Carrier Application
     repository_url: "git@git.plansource.com:app/carrier.git"
     stages:
@@ -115,6 +127,7 @@ projects:
         cancel_queued_deploys: true
         project: Carrier Application
         cmd_meta_env: dev
+        do_stage_commands: true
       - name: Partner DEV Apps
         production: false
         cancel_queued_deploys: true
@@ -124,6 +137,7 @@ projects:
         cancel_queued_deploys: true
         project: Carrier Application
         cmd_meta_env: dev
+        do_stage_commands: true
       - name: RC Apps
         production: false
         cancel_queued_deploys: true
