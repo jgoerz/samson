@@ -289,7 +289,7 @@ commands:
   - command: |2
       # Bundles and deploys the project
       # $STAGE_NAME needs to be set
-      if [ -d vendor/cache ]; then BUNDLE_ARGS="--local"; else BUNDLE_ARGS=""; fi
+      if [ -d vendor/cache ]; then BUNDLE_ARGS="--local"; else BUNDLE_ARGS="--full-index"; fi
       bundle install $BUNDLE_ARGS --jobs 4 --without test --path $CACHE_DIR/bundle --quiet
       bundle exec cap $STAGE_NAME deploy --trace
     project:
