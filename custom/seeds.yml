@@ -2,144 +2,287 @@
 projects:
   - name: Benefits Application
     repository_url: "git@git.plansource.com:app/benefits.git"
+    permalink: benefits
     stages:
       - name: DEV Apps
         production: false
+        permalink: "dev-apps"
         cancel_queued_deploys: true
         cmd_meta_env: dev
+        pipelines:
+          - "DEV Utility"
+        webhooks:
+          - branch: "origin/develop"
+            source: "jenkins"
+        notify_slack: true
         do_stage_commands: true
       - name: DEV Utility
         production: false
+        permalink: "dev-utility"
         cancel_queued_deploys: true
         cmd_meta_env: dev-utility
+        webhooks:
+          - branch: "origin/develop"
+            source: "jenkins"
+        notify_slack: true
         do_stage_commands: true
       - name: Partner DEV Apps
         production: false
+        permalink: "partner-dev-apps"
         cancel_queued_deploys: true
         cmd_meta_env: partner-dev
+        pipelines:
+          - "Partner Dev Utility"
+        webhooks:
+          - branch: "origin/develop"
+            source: "jenkins"
+        notify_slack: true
         do_stage_commands: true
       - name: Partner DEV Utility
         production: false
+        permalink: "partner-dev-utility"
         cancel_queued_deploys: true
         cmd_meta_env: partner-dev-utility
+        webhooks:
+          - branch: "origin/develop"
+            source: "jenkins"
+        notify_slack: true
         do_stage_commands: true
       - name: UAT Apps
         production: false
+        permalink: "uat-apps"
         cancel_queued_deploys: true
         cmd_meta_env: uat
+        pipelines:
+          - "UAT Utility"
+        webhooks:
+          - branch: "origin/develop"
+            source: "jenkins"
+        notify_slack: true
         do_stage_commands: true
       - name: UAT Utility
         production: false
+        permalink: "uat-utility"
         cancel_queued_deploys: true
         cmd_meta_env: uat-utility
+        webhooks:
+          - branch: "origin/develop"
+            source: "jenkins"
+        notify_slack: true
         do_stage_commands: true
       - name: RC Apps
         production: false
+        permalink: "rc-apps"
         cancel_queued_deploys: true
         cmd_meta_env: rc
+        pipelines:
+          - "RC Utility"
+          - "Cycle Server RC"
+        webhooks:
+          - branch: "origin/rc-patches"
+            source: "jenkins"
+        notify_slack: true
         do_stage_commands: true
       - name: RC Utility
         production: false
+        permalink: "rc-utility"
         cancel_queued_deploys: true
         cmd_meta_env: rc-utility
+        webhooks:
+          - branch: "origin/rc-patches"
+            source: "jenkins"
+        notify_slack: true
         do_stage_commands: true
       - name: Cycle Server RC
         production: false
+        permalink: "cycle-server-rc"
         cancel_queued_deploys: true
         cmd_meta_env: cycle-rc
+        webhooks:
+          - branch: "origin/rc-patches"
+            source: "jenkins"
+        notify_slack: true
         do_stage_commands: true
       - name: Cycle Server Master
         production: false
+        permalink: "cycle-server-master"
         cancel_queued_deploys: true
         cmd_meta_env: cycle-master
+        webhooks:
+          - branch: "origin/master"
+            source: "jenkins"
+        notify_slack: true
         do_stage_commands: true
   - name: Broker Application
     repository_url: "git@git.plansource.com:app/broker.git"
+    permalink: broker
     stages:
       - name: DEV Apps
         production: false
+        permalink: "dev-apps"
         cancel_queued_deploys: true
         cmd_meta_env: dev
+        webhooks:
+          - branch: "origin/develop"
+            source: "jenkins"
+        notify_slack: true
         do_stage_commands: true
       - name: Partner DEV Apps
         production: false
+        permalink: "partner-dev-apps"
         cancel_queued_deploys: true
         cmd_meta_env: partner-dev
+        webhooks:
+          - branch: "origin/develop"
+            source: "jenkins"
+        notify_slack: true
         do_stage_commands: true
       - name: UAT Apps
         production: false
+        permalink: "uat-apps"
         cancel_queued_deploys: true
         cmd_meta_env: uat
+        webhooks:
+          - branch: "origin/develop"
+            source: "jenkins"
+        notify_slack: true
         do_stage_commands: true
       - name: RC Apps
         production: false
+        permalink: "rc-apps"
         cancel_queued_deploys: true
         cmd_meta_env: rc
+        pipelines:
+          - "Cycle Server RC"
+        webhooks:
+          - branch: "origin/rc-patches"
+            source: "jenkins"
+        notify_slack: true
         do_stage_commands: true
       - name: Cycle Server RC
         production: false
+        permalink: "cycle-server-rc"
         cancel_queued_deploys: true
         cmd_meta_env: cycle-rc
+        webhooks:
+          - branch: "origin/rc-patches"
+            source: "jenkins"
+        notify_slack: true
         do_stage_commands: true
       - name: Cycle Server Master
         production: false
+        permalink: "cycle-server-master"
         cancel_queued_deploys: true
         cmd_meta_env: cycle-master
+        webhooks:
+          - branch: "origin/master"
+            source: "jenkins"
+        notify_slack: true
         do_stage_commands: true
   - name: Admin Application
     repository_url: "git@git.plansource.com:app/admin.git"
+    permalink: admin
     stages:
       - name: DEV Apps
         production: false
+        permalink: "dev-apps"
         cancel_queued_deploys: true
         cmd_meta_env: dev
+        webhooks:
+          - branch: "origin/develop"
+            source: "jenkins"
+        notify_slack: true
         do_stage_commands: true
       - name: Partner DEV Apps
         production: false
+        permalink: "partner-dev-apps"
         cancel_queued_deploys: true
         cmd_meta_env: partner-dev
+        webhooks:
+          - branch: "origin/develop"
+            source: "jenkins"
+        notify_slack: true
         do_stage_commands: true
       - name: UAT Apps
         production: false
+        permalink: "uat-apps"
         cancel_queued_deploys: true
         cmd_meta_env: uat
+        webhooks:
+          - branch: "origin/develop"
+            source: "jenkins"
+        notify_slack: true
         do_stage_commands: true
       - name: RC Apps
         production: false
+        permalink: "rc-apps"
         cancel_queued_deploys: true
         cmd_meta_env: rc
+        pipelines:
+          - "Cycle Server RC"
+        webhooks:
+          - branch: "origin/rc-patches"
+            source: "jenkins"
+        notify_slack: true
         do_stage_commands: true
       - name: Cycle Server RC
         production: false
+        permalink: "cycle-server-rc"
         cancel_queued_deploys: true
         cmd_meta_env: cycle-rc
+        webhooks:
+          - branch: "origin/rc-patches"
+            source: "jenkins"
+        notify_slack: true
         do_stage_commands: true
       - name: Cycle Server Master
         production: false
+        permalink: "cycle-server-master"
         cancel_queued_deploys: true
         cmd_meta_env: cycle-master
+        webhooks:
+          - branch: "origin/master"
+            source: "jenkins"
+        notify_slack: true
         do_stage_commands: true
   - name: Carrier Application
     repository_url: "git@git.plansource.com:app/carrier.git"
+    permalink: carrier
     stages:
       - name: DEV Apps
         production: false
+        permalink: "dev-apps"
         cancel_queued_deploys: true
         project: Carrier Application
         cmd_meta_env: dev
+        webhooks:
+          - branch: "origin/develop"
+            source: "jenkins"
+        notify_slack: true
         do_stage_commands: true
       - name: Partner DEV Apps
         production: false
+        permalink: "partner-dev-apps"
         cancel_queued_deploys: true
+        webhooks:
+          - branch: "origin/develop"
+            source: "jenkins"
+        notify_slack: true
         project: Carrier Application
       - name: UAT Apps
         production: false
+        permalink: "uat-apps"
         cancel_queued_deploys: true
         project: Carrier Application
         cmd_meta_env: dev
+        webhooks:
+          - branch: "origin/develop"
+            source: "jenkins"
+        notify_slack: true
         do_stage_commands: true
       - name: RC Apps
         production: false
+        permalink: "rc-apps"
         cancel_queued_deploys: true
         project: Carrier Application
 commands:
@@ -151,6 +294,8 @@ commands:
       export rvm_bin_path=/usr/local/rvm/gems/ruby-2.4.1/bin
       export GEM_PATH=/usr/local/rvm/gems/ruby-2.4.1
       export GEM_HOME=/usr/local/rvm/gems/ruby-2.4.1
+      export I_AM_ALLOWED_TO_DEPLOY_AS_LONG_AS_I_AM_NEAR_THE_HEAD_OF_BRANCH="true"
+      sed -e '/set :notify_slack, true/ s/^#*/#/' -i config/deploy.rb
     project:
     id: 0
     meta_env: all

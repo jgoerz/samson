@@ -31,16 +31,41 @@ if data.key?('projects')
   data['projects'].each do |project|
     p_obj = Project.create!(
       name: project['name'],
-      repository_url: project['repository_url']
+      repository_url: project['repository_url'],
+      permalink: project['permalink']
     )
+    project['id'] = p_obj.id
 
     if project.key?('stages')
       project['stages'].each do |stage|
         s_obj = p_obj.stages.create!(
           name: stage['name'],
           production: stage['production'],
-          cancel_queued_deploys: stage['cancel_queued_deploys']
+          cancel_queued_deploys: stage['cancel_queued_deploys'],
+          permalink: stage['permalink']
         )
+        stage['id'] = s_obj.id
+
+        if stage.key?('webhooks')
+          webhooks = stage['webhooks']
+          webhooks.each do |webhook|
+            Webhook.create!(
+              project_id: p_obj.id,
+              stage_id: s_obj.id,
+              branch: webhook['branch'],
+              source: webhook['source']
+            )
+          end
+        end
+
+        if stage.key?('notify_slack') && stage['notify_slack'] == true
+          SlackWebhook.create!(
+            webhook_url: 'https://hooks.slack.com/services/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',
+            stage_id: s_obj.id,
+            before_deploy: true,
+            after_deploy: true
+          )
+        end
 
         # Create default stage scripts, basically a join table of stages and commands with position
         # parameter to show sequence of commands.  There are currently 8 steps to each sequence if
@@ -91,6 +116,31 @@ if data.key?('projects')
     end
   end
 end
+
+# Handle slack webhooks, need references to project_id and stage_id.
+if data.key?('projects')
+  data['projects'].each do |project|
+    stages_w_pipelines = project['stages'].select do |stage|
+      if stage.key?('pipelines')
+        true
+      else
+        false
+      end
+    end
+
+    stages_w_pipelines.each do |stage|
+      s_obj = Stage.find(stage['id'])
+      followers = []
+      stage['pipelines'].each do |next_stage_name|
+        follower = project['stages'].detect{|s| s['name'] == next_stage_name}
+        followers << follower['id'] if follower
+      end
+      s_obj.next_stage_ids = followers
+      s_obj.save!
+    end
+  end
+end
+
 
 # external_id follows this format:
 # AUTH_MODULE-IDENTIFIER
