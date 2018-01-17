@@ -7,6 +7,7 @@ SingleCov.covered!
 describe ApplicationHelper do
   include LocksHelper
   include StatusHelper
+  include ERB::Util
 
   describe "#render_log" do
     it "removes translates ascii escapes to html colors" do
@@ -156,51 +157,29 @@ describe ApplicationHelper do
       refute github_ok?
     end
 
-    describe "with an OK response" do
-      before do
-        stub_request(:get, status_url).to_return(
-          headers: { content_type: 'application/json' },
-          body: JSON.dump(status: 'good')
-        )
-      end
-
-      it 'returns ok and caches' do
+    it "caches good response" do
+      assert_request(:get, status_url, to_return: {body: {status: 'good'}.to_json}) do
         assert github_ok?
         Rails.cache.read(github_status_cache_key).must_equal true
       end
     end
 
-    describe "with a bad response" do
-      before do
-        stub_request(:get, status_url).to_return(
-          headers: { content_type: 'application/json' },
-          body: JSON.dump(status: 'bad')
-        )
-      end
-
-      it 'returns false and does not cache' do
+    it "caches bad response" do
+      assert_request(:get, status_url, to_return: {body: {status: 'bad'}.to_json}) do
         refute github_ok?
         Rails.cache.read(github_status_cache_key).must_equal false
       end
     end
 
-    describe "with an invalid response" do
-      before do
-        stub_request(:get, status_url).to_return(status: 400)
-      end
-
-      it 'returns false and does not cache' do
+    it "caches invalid response" do
+      assert_request(:get, status_url, to_return: {status: 400}) do
         refute github_ok?
         Rails.cache.read(github_status_cache_key).must_equal false
       end
     end
 
-    describe "with a timeout" do
-      before do
-        stub_request(:get, status_url).to_timeout
-      end
-
-      it 'returns false caches' do
+    it "caches timeout" do
+      assert_request(:get, status_url, to_timeout: []) do
         refute github_ok?
         Rails.cache.read(github_status_cache_key).must_equal false
       end
@@ -422,8 +401,32 @@ describe ApplicationHelper do
   end
 
   describe "#additional_info" do
+    let(:always_attributes) { 'data-toggle="popover" data-placement="right" data-trigger="hover"' }
+
     it "builds a help text" do
-      additional_info("foo").must_equal "<i class=\"glyphicon glyphicon-info-sign\" title=\"foo\"></i>"
+      additional_info("foo").must_equal(
+        %(<i class="glyphicon glyphicon-info-sign" data-content="foo" #{always_attributes}></i>)
+      )
+    end
+
+    it "escapes html in the help text" do
+      additional_info("<em>foo</em>").must_equal(
+        %(<i class="glyphicon glyphicon-info-sign" data-content="&lt;em&gt;foo&lt;/em&gt;" #{always_attributes}></i>)
+      )
+    end
+
+    it "escapes html html_safe strings and sets the 'data-html' attribute" do
+      additional_info("<em>foo</em>".html_safe).must_equal(
+        %(<i class="glyphicon glyphicon-info-sign" data-content="&lt;em&gt;foo&lt;/em&gt;" data-html="true" #{always_attributes}></i>)
+      )
+    end
+
+    it "double escapes html_safe string with appened non-safe html and sets the 'data-html' attribute" do
+      string = "".html_safe << "<em>foo</em>"
+
+      additional_info(string).must_equal(
+        %(<i class="glyphicon glyphicon-info-sign" data-content="&amp;lt;em&amp;gt;foo&amp;lt;/em&amp;gt;" data-html="true" #{always_attributes}></i>)
+      )
     end
   end
 
@@ -678,7 +681,8 @@ describe ApplicationHelper do
     it "shows active deploys" do
       deploys(:succeeded_test).job.update_column(:status, 'running')
       html = deployed_or_running_list(stage_list, "staging")
-      html.must_equal "<span class=\"label label-success release-stage\"><i title=\"running\" class=\"glyphicon glyphicon-cloud-upload\"></i> Staging</span> "
+      html.must_equal "<span class=\"label label-warning release-stage\">Staging</span> "
     end
   end
 end
+# rubocop:enable Metrics/LineLength

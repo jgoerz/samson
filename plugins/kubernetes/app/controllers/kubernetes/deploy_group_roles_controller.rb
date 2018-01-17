@@ -1,13 +1,14 @@
 # frozen_string_literal: true
 class Kubernetes::DeployGroupRolesController < ApplicationController
   before_action :find_role, only: [:show, :edit, :update, :destroy]
+  before_action :find_roles, only: [:edit_many, :update_many]
   before_action :find_stage, only: [:seed]
   before_action :authorize_project_admin!, except: [:index, :show, :new]
 
   DEFAULT_BRANCH = "master"
 
   def new
-    attributes = (params[:kubernetes_deploy_group_role] ? deploy_group_role_params : {})
+    attributes = deploy_group_role_params if params[:kubernetes_deploy_group_role]
     @deploy_group_role = ::Kubernetes::DeployGroupRole.new(attributes)
   end
 
@@ -21,12 +22,23 @@ class Kubernetes::DeployGroupRolesController < ApplicationController
   end
 
   def index
-    @deploy_group_roles = ::Kubernetes::DeployGroupRole
+    if params[:project_id]
+      find_roles
+    else
+      @deploy_group_roles = ::Kubernetes::DeployGroupRole
+      [:project_id, :deploy_group_id].each do |scope|
+        if id = params.dig(:search, scope).presence
+          @deploy_group_roles = @deploy_group_roles.where(scope => id)
+        end
+      end
+    end
+
     [:project_id, :deploy_group_id].each do |scope|
       if id = params.dig(:search, scope).presence
         @deploy_group_roles = @deploy_group_roles.where(scope => id)
       end
     end
+
     @deploy_group_roles = @deploy_group_roles.
       joins(:project, :kubernetes_role).
       order('projects.name, kubernetes_roles.name')
@@ -57,14 +69,29 @@ class Kubernetes::DeployGroupRolesController < ApplicationController
   end
 
   def update
-    @deploy_group_role.assign_attributes(
-      deploy_group_role_params.except(:project_id, :deploy_group_id, :kubernetes_role_id)
-    )
+    @deploy_group_role.assign_attributes(update_deploy_group_role_params)
     if @deploy_group_role.save
       redirect_back fallback_location: @deploy_group_role
     else
-      puts @deploy_group_role.errors.full_messages
       render :edit, status: 422
+    end
+  end
+
+  def edit_many
+  end
+
+  def update_many
+    all_params = params.require(:kubernetes_deploy_group_roles)
+    status = @deploy_group_roles.map do |deploy_group_role|
+      role_params = all_params.require(deploy_group_role.id.to_s)
+      attributes = update_deploy_group_role_params(scope: role_params)
+      deploy_group_role.update_attributes(attributes)
+    end
+
+    if status.all?
+      redirect_to project_kubernetes_deploy_group_roles_path(@project), notice: "Updated!"
+    else
+      render :edit_many
     end
   end
 
@@ -89,6 +116,10 @@ class Kubernetes::DeployGroupRolesController < ApplicationController
   end
 
   private
+
+  def find_roles
+    @deploy_group_roles = current_project.kubernetes_deploy_group_roles
+  end
 
   def verification_template
     project = @deploy_group_role.project
@@ -120,13 +151,16 @@ class Kubernetes::DeployGroupRolesController < ApplicationController
   end
 
   def current_project
-    if action_name == 'create'
-      Project.find(deploy_group_role_params.require(:project_id))
-    elsif action_name == 'seed'
-      @stage.project
-    else
-      @deploy_group_role.project
-    end
+    @project ||=
+      if action_name == 'create'
+        Project.find(deploy_group_role_params.require(:project_id))
+      elsif action_name == 'seed'
+        @stage.project
+      elsif ['index', 'edit_many', 'update_many'].include?(action_name)
+        Project.find_by_param!(params.require(:project_id))
+      else
+        @deploy_group_role.project
+      end
   end
 
   def find_role
@@ -137,8 +171,12 @@ class Kubernetes::DeployGroupRolesController < ApplicationController
     @stage = Stage.find(params.require(:stage_id))
   end
 
-  def deploy_group_role_params
-    params.require(:kubernetes_deploy_group_role).permit(
+  def update_deploy_group_role_params(*args)
+    deploy_group_role_params(*args).except(:project_id, :deploy_group_id, :kubernetes_role_id)
+  end
+
+  def deploy_group_role_params(scope: params.require(:kubernetes_deploy_group_role))
+    scope.permit(
       :kubernetes_role_id, :requests_memory, :requests_cpu, :limits_memory, :limits_cpu,
       :replicas, :project_id, :deploy_group_id
     )

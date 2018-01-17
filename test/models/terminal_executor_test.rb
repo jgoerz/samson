@@ -116,7 +116,7 @@ describe TerminalExecutor do
     end
 
     it "does not log cursor movement ... special output coming from docker builds" do
-      assert subject.execute("ruby -e 'puts %{Hello\\r\e[1B\\nWorld\\n}'")
+      assert subject.execute("ruby -e 'puts \"Hello\\r\e[1B\\nWorld\\n\"'")
       output.string.must_equal "Hello\rWorld\r\n"
     end
 
@@ -255,6 +255,22 @@ describe TerminalExecutor do
     it "makes a unreadable script" do
       subject.send(:script_as_executable, "echo 1") do |path|
         File.stat(path).mode.must_equal 0o100700
+      end
+    end
+
+    it "makes project findable" do
+      project = projects(:test)
+      subject.instance_variable_set(:@project, project)
+      subject.send(:script_as_executable, "echo 1") do |path|
+        path.must_include "-#{project.permalink}-"
+      end
+    end
+
+    it "makes deploy findable" do
+      deploy = deploys(:succeeded_test)
+      subject.instance_variable_set(:@deploy, deploy)
+      subject.send(:script_as_executable, "echo 1") do |path|
+        path.must_include "-#{deploy.id}-"
       end
     end
 

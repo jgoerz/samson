@@ -38,14 +38,16 @@ describe Samson::Secrets::VaultServer do
     end
 
     it "is invalid when it cannot connect to vault" do
-      stub_request(:get, "http://vault-land.com/v1/secret/apps/?list=true").to_timeout
-      refute_valid server
+      assert_request(:get, "http://vault-land.com/v1/secret/apps/?list=true", to_timeout: []) do
+        refute_valid server
+      end
     end
 
     it "is invalid when vault connection fails" do
-      stub_request(:get, "http://vault-land.com/v1/secret/apps/?list=true").
-        to_raise(Vault::HTTPError.new("address", stub(code: '200')))
-      refute_valid server
+      assert_request(
+        :get, "http://vault-land.com/v1/secret/apps/?list=true",
+        to_raise: Vault::HTTPError.new("address", stub(code: '200'))
+      ) { refute_valid server }
     end
   end
 
@@ -123,9 +125,9 @@ describe Samson::Secrets::VaultServer do
   describe "#list_recursive" do
     it "iterates through all keys" do
       stub_request(:get, "http://vault-land.com/v1/secret/apps/?list=true").
-        to_return(headers: {content_type: 'application/json'}, body: {data: {keys: ['abc/'.dup, 'def'.dup]}}.to_json)
+        to_return(headers: {content_type: 'application/json'}, body: {data: {keys: [+'abc/', +'def']}}.to_json)
       stub_request(:get, "http://vault-land.com/v1/secret/apps/abc/?list=true").
-        to_return(headers: {content_type: 'application/json'}, body: {data: {keys: ['ghi'.dup]}}.to_json)
+        to_return(headers: {content_type: 'application/json'}, body: {data: {keys: [+'ghi']}}.to_json)
 
       server = create_vault_server(name: 'pod0')
       Samson::Secrets::VaultServer.any_instance.unstub(:validate_connection)

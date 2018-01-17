@@ -273,7 +273,7 @@ describe Kubernetes::Api::Pod do
 
     describe "probe failures" do
       before do
-        event.merge!(type: 'Warning', reason: 'Unhealthy', message: "Readiness probe failed: Get ".dup, count: 1)
+        event.merge!(type: 'Warning', reason: 'Unhealthy', message: +"Readiness probe failed: Get ", count: 1)
       end
 
       it "is false with single Readiness event" do
@@ -303,6 +303,30 @@ describe Kubernetes::Api::Pod do
         assert event[:message].sub!('Readiness', 'Liveness')
         event[:count] = 20
         assert events_indicate_failure?
+      end
+    end
+
+    describe "HorizontalPodAutoscaler with failures we don't care about" do
+      before do
+        event.merge!(kind: 'HorizontalPodAutoscaler', type: 'Warning')
+      end
+
+      it "ignores failing to get metrics" do
+        event[:reason] = 'FailedGetMetrics'
+
+        refute events_indicate_failure?, 'FailedGetMetrics must not be recognized as failures'
+      end
+
+      it "ingores failures to scale" do
+        event[:reason] = 'FailedRescale'
+
+        refute events_indicate_failure?, 'FailedRescale must not be recognized as failures'
+      end
+
+      it "does not ignore an unknown HPA event" do
+        event[:reason] = 'SomeOtherFailure'
+
+        assert events_indicate_failure?, 'Events we dont explicitly ignore must be recognized as failures'
       end
     end
   end

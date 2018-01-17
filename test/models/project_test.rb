@@ -4,8 +4,6 @@ require_relative '../test_helper'
 SingleCov.covered!
 
 describe Project do
-  include StubGithubAPI
-
   let(:project) { projects(:test) }
   let(:author) { users(:deployer) }
   let(:url) { "git://foo.com:hello/world.git" }
@@ -325,14 +323,14 @@ describe Project do
     it 'returns unstarred projects in alphabetical order' do
       Project.create!(name: 'A', repository_url: url)
       Project.create!(name: 'Z', repository_url: url)
-      Project.ordered_for_user(author).map(&:name).must_equal ['A', 'Foo', 'Z']
+      Project.ordered_for_user(author).map(&:name).must_equal ['A', 'Bar', 'Foo', 'Z']
     end
 
     it 'returns starred projects in alphabetical order' do
       Project.create!(name: 'A', repository_url: url)
       z = Project.create!(name: 'Z', repository_url: url)
       author.stars.create!(project: z)
-      Project.ordered_for_user(author).map(&:name).must_equal ['Z', 'A', 'Foo']
+      Project.ordered_for_user(author).map(&:name).must_equal ['Z', 'A', 'Bar', 'Foo']
     end
   end
 
@@ -373,6 +371,14 @@ describe Project do
 
     it "builds folders" do
       project.docker_repo(DockerRegistry.first, "baz/Dockerfile").must_equal "docker-registry.example.com/bar/foo-baz"
+    end
+  end
+
+  describe "#docker_image" do
+    with_registries ["docker-registry.example.com/bar"]
+
+    it "builds nonstandard" do
+      project.docker_image("Dockerfile.baz").must_equal "foo-baz"
     end
   end
 
