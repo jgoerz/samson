@@ -8,14 +8,6 @@ module SamsonGcloud
   end
 
   class << self
-    def container_in_beta
-      @@container_in_beta ||= begin
-        beta = Samson::CommandExecutor.execute("gcloud", "--version", timeout: 10).
-          last.match?(/Google Cloud SDK 14\d\./)
-        beta ? ["beta"] : []
-      end
-    end
-
     def cli_options
       Shellwords.split(ENV.fetch('GCLOUD_OPTIONS', '')) +
         ["--account", account, "--project", project]
@@ -32,6 +24,7 @@ module SamsonGcloud
 end
 
 Samson::Hooks.view :project_form_checkbox, "samson_gcloud/project_form_checkbox"
+Samson::Hooks.view :build_button, "samson_gcloud/build_button"
 
 Samson::Hooks.callback :after_deploy do |deploy, _|
   SamsonGcloud::ImageTagger.tag(deploy) if ENV['GCLOUD_IMAGE_TAGGER'] == 'true'

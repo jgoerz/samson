@@ -9,6 +9,7 @@ module Samson
       :stage_show,
       :project_form,
       :project_form_checkbox,
+      :build_button,
       :build_new,
       :deploy_group_show,
       :deploy_group_form,
@@ -45,6 +46,7 @@ module Samson
       :release_deploy_conditions,
       :deploy_group_env,
       :link_parts_for_resource,
+      :can,
     ].freeze
 
     INTERNAL_HOOKS = [:class_defined].freeze

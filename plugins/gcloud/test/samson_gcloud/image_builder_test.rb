@@ -20,10 +20,7 @@ describe SamsonGcloud::ImageBuilder do
 
     around { |test| Dir.mktmpdir { |dir| Dir.chdir(dir) { test.call } } }
 
-    before do
-      Dir.mkdir 'some-dir'
-      SamsonGcloud.stubs(container_in_beta: [])
-    end
+    before { Dir.mkdir 'some-dir' }
 
     it "builds using a custom cloudbuild.yml" do
       build_image
@@ -122,6 +119,24 @@ describe SamsonGcloud::ImageBuilder do
       executor.expects(:execute).with { output.write "foo digest: sha-123:abc" }.returns(true)
       build_image.must_equal "#{repo}-changed@sha-123:abc"
       build.external_url.must_be_nil
+    end
+
+    it "ignores files that are in dockerignore since we only build" do
+      File.write("some-dir/.dockerignore", "foo")
+      File.write("some-dir/.gitignore", "foo")
+      build_image
+      File.read("some-dir/.gcloudignore").must_equal "#!include:.gitignore\n#!include:.dockerignore"
+    end
+
+    it "does not include missing files and ignores .git by default" do
+      build_image
+      File.read("some-dir/.gcloudignore").must_equal ".git"
+    end
+
+    it "keeps ignores files if they are configured" do
+      File.write("some-dir/.gcloudignore", "X")
+      build_image
+      File.read("some-dir/.gcloudignore").must_equal "X"
     end
   end
 end

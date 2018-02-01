@@ -84,11 +84,14 @@ Samson::Application.routes.draw do
 
   resources :deploy_groups do
     member do
-      post :deploy_all
-      get :create_all_stages_preview
-      post :create_all_stages
-      post :merge_all_stages
-      post :delete_all_stages
+      get :missing_config
+    end
+
+    resource :mass_rollouts, only: [:new, :create, :destroy] do
+      collection do
+        post :merge
+        post :deploy
+      end
     end
   end
 

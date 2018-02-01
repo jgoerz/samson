@@ -45,11 +45,11 @@ gem 'concurrent-ruby'
 gem 'vault'
 gem 'docker-api'
 gem 'newrelic_rpm'
-gem 'ddtrace' # datadog APM
 gem 'lograge'
 gem 'logstash-event'
 gem 'diffy'
 gem 'validates_lengths_from_database'
+gem 'large_object_store'
 
 # treat included plugins like gems
 Dir[File.join(Bundler.root, 'plugins/*/')].each { |f| gemspec path: f }
@@ -91,6 +91,7 @@ group :assets do
     gem 'rails-assets-x-editable'
     gem 'rails-assets-jstimezonedetect'
     gem 'rails-assets-jquery-cookie'
+    gem 'rails-assets-jsSHA'
   end
 end
 

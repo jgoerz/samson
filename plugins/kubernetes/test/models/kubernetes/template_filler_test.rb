@@ -23,7 +23,6 @@ describe Kubernetes::TemplateFiller do
 
   before do
     doc.send(:resource_template=, YAML.load_stream(read_kubernetes_sample_file('kubernetes_deployment.yml')))
-    doc.kubernetes_release.deploy_id = 123
     stub_request(:get, %r{http://foobar.server/api/v1/namespaces/\S+/secrets}).to_return(body: "{}")
     Samson::Secrets::VaultClient.any_instance.stubs(:client).
       returns(stub(options: {address: 'https://test.hvault.server', ssl_verify: false}))
@@ -47,7 +46,7 @@ describe Kubernetes::TemplateFiller do
         role: "some-role",
         deploy_group: 'pod1',
         deploy_group_id: doc.deploy_group_id.to_s,
-        deploy_id: "123"
+        deploy_id: doc.kubernetes_release.deploy_id.to_s
       )
 
       metadata = result.fetch(:metadata)
@@ -443,7 +442,7 @@ describe Kubernetes::TemplateFiller do
       end
 
       it "fails when vault is not configured" do
-        with_env('SECRET_STORAGE_BACKEND': "SecretStorage::HashicorpVault") do
+        with_env('SECRET_STORAGE_BACKEND': "Samson::Secrets::HashicorpVaultBackend") do
           Samson::Secrets::VaultClient.client.expects(:client).raises("Could not find Vault config for pod1")
           e = assert_raises { template.to_hash }
           e.message.must_equal "Could not find Vault config for pod1"
@@ -451,7 +450,7 @@ describe Kubernetes::TemplateFiller do
       end
 
       it "adds the vault server address to the cotainers env" do
-        with_env(SECRET_STORAGE_BACKEND: "SecretStorage::HashicorpVault") do
+        with_env(SECRET_STORAGE_BACKEND: "Samson::Secrets::HashicorpVaultBackend") do
           assert template_env.any? { |env| env.any? { |_k, v| v == "VAULT_ADDR" } }
         end
       end
@@ -488,7 +487,7 @@ describe Kubernetes::TemplateFiller do
 
       it "fails when it cannot find secrets needed by the puller" do
         raw_template[:spec][:template][:metadata][:annotations].replace('secret/FOO': 'bar', 'secret/BAR': 'baz')
-        SecretStorage.delete(secret_key)
+        Samson::Secrets::Manager.delete(secret_key)
         e = assert_raises(Samson::Hooks::UserError) { template.to_hash }
         e.message.must_include "bar (tried: production/foo/pod1/bar"
         e.message.must_include "baz (tried: production/foo/pod1/baz" # shows all at once for easier debugging
@@ -554,6 +553,27 @@ describe Kubernetes::TemplateFiller do
 
       it "matches the resource name" do
         template.to_hash.dig_fetch(:spec, :scaleTargetRef, :name).must_equal("test-app-server")
+      end
+    end
+
+    describe "blue-green" do
+      before do
+        doc.kubernetes_role.blue_green = true
+        doc.kubernetes_release.blue_green_color = 'green'
+      end
+
+      it "modifies the service" do
+        raw_template[:kind] = 'Service'
+        template.to_hash.dig_fetch(:spec, :selector, :blue_green).must_equal 'green'
+      end
+
+      it "modifies the resource" do
+        hash = template.to_hash
+        hash.dig_fetch(:metadata, :name).must_equal 'test-app-server-green'
+        hash.dig_fetch(:spec, :template, :spec, :containers, 0, :env).must_include(name: "BLUE_GREEN", value: "green")
+        hash.dig_fetch(:metadata, :labels, :blue_green).must_equal 'green'
+        hash.dig_fetch(:spec, :selector, :matchLabels, :blue_green).must_equal 'green'
+        hash.dig_fetch(:spec, :template, :metadata, :labels, :blue_green).must_equal 'green'
       end
     end
   end

@@ -7,10 +7,11 @@ module Kubernetes
   # and see what it does internally ... simple create/update/delete requests or special magic ?
   module Resource
     class Base
-      def initialize(template, deploy_group, autoscaled:)
+      def initialize(template, deploy_group, autoscaled:, delete_resource:)
         @template = template
         @deploy_group = deploy_group
         @autoscaled = autoscaled
+        @delete_resource = delete_resource
       end
 
       def name
@@ -31,12 +32,20 @@ module Kubernetes
       end
 
       def deploy
-        running? ? update : create
+        if running?
+          if @delete_resource
+            delete
+          else
+            update
+          end
+        else
+          create unless @delete_resource
+        end
       end
 
       def revert(previous)
         if previous
-          self.class.new(previous, @deploy_group, autoscaled: @autoscaled).deploy
+          self.class.new(previous, @deploy_group, autoscaled: @autoscaled, delete_resource: false).deploy
         else
           delete
         end
@@ -223,7 +232,12 @@ module Kubernetes
         # Wait for there to be zero pods
         loop do
           loop_sleep
-          break if fetch_resource.dig_fetch(:status, :replicas).zero?
+          # prevent cases when status.replicas are missing
+          # e.g. running locally on Minikube, after scale replicas to zero
+          # $ kubectl scale deployment {DEPLOYMENT_NAME} --replicas 0
+          # "replicas" key is actually removed from "status" map
+          # $ {"status":{"conditions":[...],"observedGeneration":2}}
+          break if fetch_resource.dig(:status, :replicas).to_i.zero?
         end
 
         # delete the actual deployment
