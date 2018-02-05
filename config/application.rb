@@ -32,6 +32,7 @@ end
 ###
 
 require_relative "../lib/samson/env_check"
+require_relative "../lib/samson/initializer_logging"
 
 module Samson
   class Application < Rails::Application
@@ -72,7 +73,7 @@ module Samson
           socket_failure_delay: 0.2
         )
       end
-      config.cache_store = :dalli_store, servers, options
+      config.cache_store = :mem_cache_store, servers, options
     end
 
     # Allow streaming
