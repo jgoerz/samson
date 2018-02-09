@@ -91,7 +91,7 @@ describe Kubernetes::DeployExecutor do
       job.update_column(:commit, build.git_sha) # this is normally done by JobExecution
       Kubernetes::Role.stubs(:configured_for_project).returns(project.kubernetes_roles)
       kubernetes_fake_raw_template
-      Kubernetes::Cluster.any_instance.stubs(connection_valid?: true, namespace_exists?: true)
+      Kubernetes::Cluster.any_instance.stubs(connection_valid?: true, namespaces: ['staging'])
       deploy_group.create_cluster_deploy_group!(
         cluster: kubernetes_clusters(:test_cluster),
         namespace: 'staging',
@@ -162,7 +162,7 @@ describe Kubernetes::DeployExecutor do
     end
 
     it "does limited amounts of queries" do
-      assert_sql_queries(37) do
+      assert_sql_queries(27) do
         assert execute
       end
     end
@@ -640,6 +640,7 @@ describe Kubernetes::DeployExecutor do
       kubernetes_fake_raw_template
       Kubernetes::TemplateFiller.any_instance.stubs(:set_image_pull_secrets)
       doc = release.release_docs.first
+      doc.kubernetes_release.builds = [build]
       doc.send(:store_resource_template)
       doc.save!(validate: false)
     end

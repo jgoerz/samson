@@ -10,7 +10,7 @@ class MassRolloutsController < ApplicationController
   # No more than one stage, per project, per deploy_group
   # Note: you can call this multiple times, and it will create missing stages, but no redundant stages.
   def create
-    stages_created = create_all_stages
+    stages_created = create_all_stages.compact
 
     redirect_to deploy_group, notice: "Created #{stages_created.length} Stages"
   end
@@ -52,7 +52,12 @@ class MassRolloutsController < ApplicationController
   def create_all_stages
     _, missing_stages = stages_for_creation
     missing_stages.map do |template_stage|
-      create_stage_with_group template_stage
+      begin
+        create_stage_with_group template_stage
+      rescue StandardError => e
+        Rails.logger.error("Failed to create new stage from template #{template_stage.unique_name}.\n#{e.message}")
+        nil
+      end
     end
   end
 
@@ -127,10 +132,14 @@ class MassRolloutsController < ApplicationController
   end
 
   def create_stage_with_group(template_stage)
-    stage = Stage.build_clone(template_stage)
-    stage.deploy_groups << deploy_group
-    stage.name = deploy_group.name
-    stage.is_template = false
+    stage = Stage.build_clone(
+      template_stage,
+      deploy_groups: [deploy_group],
+      name: deploy_group.name,
+      is_template: false,
+      next_stage_ids: []
+    )
+
     stage.save!
 
     if template_stage.respond_to?(:next_stage_ids) # pipeline plugin was installed

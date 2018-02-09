@@ -7,6 +7,10 @@ describe Stage do
   subject { stages(:test_staging) }
   let(:stage) { subject }
 
+  it "#unique_name" do
+    assert_equal "Foo / Staging", stage.unique_name
+  end
+
   describe "validations" do
     it "is valid" do
       assert_valid stage
@@ -280,15 +284,20 @@ describe Stage do
     before do
       subject.notify_email_address = "test@test.ttt"
       subject.flowdock_flows = [FlowdockFlow.new(name: "test", token: "abcxyz", stage_id: subject.id)]
+      subject.next_stage_ids = [1, 2]
       subject.save
 
       @clone = Stage.build_clone(subject)
     end
 
     it "returns an unsaved copy of the given stage with exactly the same everything except id" do
-      @clone.attributes.except("id").except("template_stage_id").
-          must_equal subject.attributes.except("id").except("template_stage_id")
+      @clone.attributes.except("id", "next_stage_ids", "template_stage_id").
+          must_equal subject.attributes.except("id", "next_stage_ids", "template_stage_id")
       @clone.id.wont_equal subject.id
+    end
+
+    it "doesn't clone the deploy pipeline" do
+      @clone.next_stage_ids.wont_equal subject.next_stage_ids
     end
   end
 
