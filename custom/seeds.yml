@@ -26,6 +26,20 @@ projects:
             source: "jenkins"
         notify_slack: true
         do_stage_commands: true
+      - name: Trion DEV Apps
+        production: false
+        permalink: "dev-apps"
+        cancel_queued_deploys: true
+        cmd_meta_env: trion-dev
+        notify_slack: true
+        do_stage_commands: true
+      - name: Trion DEV Utility
+        production: false
+        permalink: "dev-utility"
+        cancel_queued_deploys: true
+        cmd_meta_env: trion-dev-utility
+        notify_slack: true
+        do_stage_commands: true
       - name: Partner DEV Apps
         production: false
         permalink: "partner-dev-apps"
@@ -68,6 +82,20 @@ projects:
         webhooks:
           - branch: "origin/develop"
             source: "jenkins"
+        notify_slack: true
+        do_stage_commands: true
+      - name: Trion UAT Apps
+        production: false
+        permalink: "dev-apps"
+        cancel_queued_deploys: true
+        cmd_meta_env: trion-uat
+        notify_slack: true
+        do_stage_commands: true
+      - name: Trion UAT Utility
+        production: false
+        permalink: "dev-utility"
+        cancel_queued_deploys: true
+        cmd_meta_env: trion-uat-utility
         notify_slack: true
         do_stage_commands: true
       - name: RC Apps
@@ -113,6 +141,34 @@ projects:
             source: "jenkins"
         notify_slack: true
         do_stage_commands: true
+      - name: Staging Apps
+        production: true
+        permalink: "staging-apps"
+        cancel_queued_deploys: true
+        cmd_meta_env: staging
+        notify_slack: true
+        do_stage_commands: true
+      - name: Staging Utility
+        production: true
+        permalink: "staging-utility"
+        cancel_queued_deploys: true
+        cmd_meta_env: staging-utility
+        notify_slack: true
+        do_stage_commands: true
+      - name: DR Apps
+        production: false
+        permalink: "dr-apps"
+        cancel_queued_deploys: true
+        cmd_meta_env: dr
+        notify_slack: true
+        do_stage_commands: true
+      - name: DR Utility
+        production: false
+        permalink: "dr-utility"
+        cancel_queued_deploys: true
+        cmd_meta_env: dr-utility
+        notify_slack: true
+        do_stage_commands: true
   - name: Broker Application
     repository_url: "git@git.plansource.com:app/broker.git"
     permalink: broker
@@ -125,6 +181,13 @@ projects:
         webhooks:
           - branch: "origin/develop"
             source: "jenkins"
+        notify_slack: true
+        do_stage_commands: true
+      - name: Trion DEV Apps
+        production: false
+        permalink: "dev-apps"
+        cancel_queued_deploys: true
+        cmd_meta_env: trion-dev
         notify_slack: true
         do_stage_commands: true
       - name: Partner DEV Apps
@@ -145,6 +208,13 @@ projects:
         webhooks:
           - branch: "origin/develop"
             source: "jenkins"
+        notify_slack: true
+        do_stage_commands: true
+      - name: Trion UAT Apps
+        production: false
+        permalink: "dev-apps"
+        cancel_queued_deploys: true
+        cmd_meta_env: trion-uat
         notify_slack: true
         do_stage_commands: true
       - name: RC Apps
@@ -177,6 +247,20 @@ projects:
         webhooks:
           - branch: "origin/master"
             source: "jenkins"
+        notify_slack: true
+        do_stage_commands: true
+      - name: Staging Apps
+        production: true
+        permalink: "staging-apps"
+        cancel_queued_deploys: true
+        cmd_meta_env: staging
+        notify_slack: true
+        do_stage_commands: true
+      - name: DR Apps
+        production: false
+        permalink: "dr-apps"
+        cancel_queued_deploys: true
+        cmd_meta_env: dr
         notify_slack: true
         do_stage_commands: true
   - name: Admin Application
@@ -193,6 +277,13 @@ projects:
             source: "jenkins"
         notify_slack: true
         do_stage_commands: true
+      - name: Trion DEV Apps
+        production: false
+        permalink: "dev-apps"
+        cancel_queued_deploys: true
+        cmd_meta_env: trion-dev
+        notify_slack: true
+        do_stage_commands: true
       - name: Partner DEV Apps
         production: false
         permalink: "partner-dev-apps"
@@ -211,6 +302,13 @@ projects:
         webhooks:
           - branch: "origin/develop"
             source: "jenkins"
+        notify_slack: true
+        do_stage_commands: true
+      - name: Trion UAT Apps
+        production: false
+        permalink: "dev-apps"
+        cancel_queued_deploys: true
+        cmd_meta_env: trion-uat
         notify_slack: true
         do_stage_commands: true
       - name: RC Apps
@@ -243,6 +341,20 @@ projects:
         webhooks:
           - branch: "origin/master"
             source: "jenkins"
+        notify_slack: true
+        do_stage_commands: true
+      - name: Staging Apps
+        production: true
+        permalink: "staging-apps"
+        cancel_queued_deploys: true
+        cmd_meta_env: staging
+        notify_slack: true
+        do_stage_commands: true
+      - name: DR Apps
+        production: false
+        permalink: "dr-apps"
+        cancel_queued_deploys: true
+        cmd_meta_env: dr
         notify_slack: true
         do_stage_commands: true
   - name: Carrier Application
@@ -274,7 +386,7 @@ projects:
         permalink: "uat-apps"
         cancel_queued_deploys: true
         project: Carrier Application
-        cmd_meta_env: dev
+        cmd_meta_env: uat
         webhooks:
           - branch: "origin/develop"
             source: "jenkins"
@@ -285,6 +397,31 @@ projects:
         permalink: "rc-apps"
         cancel_queued_deploys: true
         project: Carrier Application
+      - name: DR Apps
+        production: false
+        permalink: "dr-apps"
+        cancel_queued_deploys: true
+        cmd_meta_env: dr
+        notify_slack: true
+        do_stage_commands: true
+  - name: PCMS Application
+    repository_url: "git@git.plansource.com:app/pcms.git"
+    permalink: pcms
+    stages:
+      - name: DEV
+        production: false
+        permalink: "dev"
+        cancel_queued_deploys: true
+        cmd_meta_env: dev
+        notify_slack: true
+        do_stage_commands: true
+      - name: UAT
+        production: false
+        permalink: "uat"
+        cancel_queued_deploys: true
+        cmd_meta_env: uat
+        notify_slack: true
+        do_stage_commands: true
 commands:
   - command: |2
       # This should not be necessary in a container.
@@ -310,6 +447,16 @@ commands:
     id: 0
     meta_env: dev-utility
     meta_order: 2
+  - command: 'export STAGE_NAME="trion-development"'
+    project:
+    id: 0
+    meta_env: trion-dev
+    meta_order: 2
+  - command: 'export STAGE_NAME="trion-development-utility"'
+    project:
+    id: 0
+    meta_env: trion-dev-utility
+    meta_order: 2
   - command: 'export STAGE_NAME="partner-dev"'
     project:
     id: 0
@@ -329,6 +476,16 @@ commands:
     project:
     id: 0
     meta_env: uat-utility
+    meta_order: 2
+  - command: 'export STAGE_NAME="trion-uat"'
+    project:
+    id: 0
+    meta_env: trion-uat
+    meta_order: 2
+  - command: 'export STAGE_NAME="trion-uat-utility"'
+    project:
+    id: 0
+    meta_env: trion-uat-utility
     meta_order: 2
   - command: 'export STAGE_NAME="rc"'
     project:
@@ -350,20 +507,40 @@ commands:
     id: 0
     meta_env: cycle-master
     meta_order: 2
+  - command: 'export STAGE_NAME="staging"'
+    project:
+    id: 0
+    meta_env: staging
+    meta_order: 2
+  - command: 'export STAGE_NAME="staging-utility"'
+    project:
+    id: 0
+    meta_env: staging-utility
+    meta_order: 2
+  - command: 'export STAGE_NAME="dr"'
+    project:
+    id: 0
+    meta_env: dr
+    meta_order: 2
+  - command: 'export STAGE_NAME="dr-utility"'
+    project:
+    id: 0
+    meta_env: dr-utility
+    meta_order: 2
   - command: 'export STAGE_DEFAULT_BRANCH="develop"'
     project:
     id: 0
-    meta_env: branch,dev,uat,partner-dev
+    meta_env: branch,dev,trion-dev,uat,partner-dev
     meta_order: 3
   - command: 'export STAGE_DEFAULT_BRANCH="rc-patches"'
     project:
     id: 0
-    meta_env: branch,rc,cycle-rc
+    meta_env: branch,trion-uat,rc,cycle-rc
     meta_order: 3
   - command: 'export STAGE_DEFAULT_BRANCH="master"'
     project:
     id: 0
-    meta_env: branch,cycle-master
+    meta_env: branch,staging,dr,cycle-master
     meta_order: 3
   - command: 'export DEPLOY_USER="deployer"'
     project:
@@ -379,6 +556,16 @@ commands:
     project:
     id: 0
     meta_env: dev-utility
+    meta_order: 5
+  - command: "sed -e '/set :create_git_tag, true/ s/^#*/#/' -i config/deploy/trion-development.rb"
+    project:
+    id: 0
+    meta_env: trion-dev
+    meta_order: 5
+  - command: "sed -e '/set :create_git_tag, true/ s/^#*/#/' -i config/deploy/trion-development-utility.rb"
+    project:
+    id: 0
+    meta_env: trion-dev-utility
     meta_order: 5
   - command: "sed -e '/set :create_git_tag, true/ s/^#*/#/' -i config/deploy/partner-dev.rb"
     project:
@@ -400,6 +587,16 @@ commands:
     id: 0
     meta_env: uat-utility
     meta_order: 5
+  - command: "sed -e '/set :create_git_tag, true/ s/^#*/#/' -i config/deploy/trion-uat.rb"
+    project:
+    id: 0
+    meta_env: trion-uat
+    meta_order: 5
+  - command: "sed -e '/set :create_git_tag, true/ s/^#*/#/' -i config/deploy/trion-uat-utility.rb"
+    project:
+    id: 0
+    meta_env: trion-uat-utility
+    meta_order: 5
   - command: "sed -e '/set :create_git_tag, true/ s/^#*/#/' -i config/deploy/rc.rb"
     project:
     id: 0
@@ -419,6 +616,26 @@ commands:
     project:
     id: 0
     meta_env: cycle-master
+    meta_order: 5
+  - command: "sed -e '/set :create_git_tag, true/ s/^#*/#/' -i config/deploy/dr.rb"
+    project:
+    id: 0
+    meta_env: dr
+    meta_order: 5
+  - command: "sed -e '/set :create_git_tag, true/ s/^#*/#/' -i config/deploy/dr-utility.rb"
+    project:
+    id: 0
+    meta_env: dr-utility
+    meta_order: 5
+  - command: "sed -e '/set :create_git_tag, true/ s/^#*/#/' -i config/deploy/staging.rb"
+    project:
+    id: 0
+    meta_env: staging
+    meta_order: 5
+  - command: "sed -e '/set :create_git_tag, true/ s/^#*/#/' -i config/deploy/staging-utility.rb"
+    project:
+    id: 0
+    meta_env: staging-utility
     meta_order: 5
   - command: |2
       # Grab ps-shared, ps-shared-assets, and ps_spyder from the git repo instead of local directories.
@@ -448,298 +665,407 @@ commands:
     project:
     id: 0
 users:
-  - name: Anooj Rajan
-    role_id: 1
-    email: Anooj.Rajan@plansource.com
-    external_id: ldap-CN=Anooj Rajan,OU=Employees,OU=SLC,OU=People,DC=plansource,DC=local
-    time_format: relative
   - name: Bobby Schmidt
-    role_id: 1
+    id: 0
+    project_role_id: 1
+    system_role_id: 0
     email: bobby.schmidt@plansource.com
-    external_id: ldap-CN=Bobby Schmidt,OU=Employees,OU=ORL,OU=People,DC=plansource,DC=local
+    external_id: ldap-bschmidt
     time_format: relative
   - name: Brett Krchnavy
-    role_id: 1
+    id: 0
+    project_role_id: 1
+    system_role_id: 0
     email: Brett.Krchnavy@plansource.com
-    external_id: ldap-CN=Brett Krchnavy,OU=Employees,OU=MIN,OU=People,DC=plansource,DC=local
+    external_id: ldap-bkrchnavy
     time_format: relative
   - name: Chris Nimnicht
-    role_id: 1
+    id: 0
+    project_role_id: 1
+    system_role_id: 0
     email: Chris.Nimnicht@plansource.com
-    external_id: ldap-CN=Chris Nimnicht,OU=Employees,OU=SLC,OU=People,DC=plansource,DC=local
+    external_id: ldap-cnimnicht
     time_format: relative
   - name: Christian Ullman
-    role_id: 1
+    id: 0
+    project_role_id: 1
+    system_role_id: 0
     email: Christian.Ullman@plansource.com
-    external_id: ldap-CN=Christian Ullman,OU=Employees,OU=SLC,OU=People,DC=plansource,DC=local
+    external_id: ldap-cullman
     time_format: relative
   - name: Curt DuPuis
-    role_id: 1
+    id: 0
+    project_role_id: 1
+    system_role_id: 0
     email: curt.dupuis@plansource.com
-    external_id: ldap-CN=Curt DuPuis,OU=Remote Office,OU=People,DC=plansource,DC=local
+    external_id: ldap-cdupuis
     time_format: relative
   - name: Dennis Castello
-    role_id: 1
+    id: 0
+    project_role_id: 1
+    system_role_id: 0
     email: Dennis.Castello@plansource.com
-    external_id: ldap-CN=Dennis Castello,OU=Employees,OU=ORL,OU=People,DC=plansource,DC=local
+    external_id: ldap-dcastello
     time_format: relative
   - name: Dennis Enos
-    role_id: 1
+    id: 0
+    project_role_id: 1
+    system_role_id: 0
     email: Dennis.Enos@plansource.com
-    external_id: ldap-CN=Dennis Enos,OU=Employees,OU=ORL,OU=People,DC=plansource,DC=local
+    external_id: ldap-denos
     time_format: relative
   - name: Desiree Rodriguez
-    role_id: 1
+    id: 0
+    project_role_id: 1
+    system_role_id: 0
     email: desiree.rodriguez@plansource.com
-    external_id: ldap-CN=Desiree Rodriguez,OU=Employees,OU=ORL,OU=People,DC=plansource,DC=local
+    external_id: ldap-drodriguez
     time_format: relative
-  - name: Devin de la Parte
-    role_id: 1
+  - name: Devin delaparte
+    id: 0
+    project_role_id: 1
+    system_role_id: 0
     email: Devin.delaParte@plansource.com
-    external_id: ldap-CN=Devin de la Parte,OU=Employees,OU=ORL,OU=People,DC=plansource,DC=local
+    external_id: ldap-dde la Parte
     time_format: relative
   - name: Diane Meyer
-    role_id: 1
+    id: 0
+    project_role_id: 1
+    system_role_id: 0
     email: Diane.Meyer@plansource.com
-    external_id: ldap-CN=Diane Meyer,OU=Employees,OU=MIN,OU=People,DC=plansource,DC=local
+    external_id: ldap-dmeyer
     time_format: relative
   - name: Dwight Emmons
-    role_id: 1
+    id: 0
+    project_role_id: 1
+    system_role_id: 0
     email: dwight.emmons@plansource.com
-    external_id: ldap-CN=Dwight Emmons,OU=Remote Office,OU=People,DC=plansource,DC=local
+    external_id: ldap-demmons
     time_format: relative
   - name: Edward Kerns
-    role_id: 1
+    id: 0
+    project_role_id: 1
+    system_role_id: 0
     email: edward.kerns@plansource.com
-    external_id: ldap-CN=Edward Kerns,OU=Employees,OU=PSPS - NGE,OU=People,DC=plansource,DC=local
+    external_id: ldap-ekerns
     time_format: relative
   - name: Eric Copp
-    role_id: 1
+    id: 0
+    project_role_id: 1
+    system_role_id: 0
     email: Eric.Copp@plansource.com
-    external_id: ldap-CN=Eric Copp,OU=Employees,OU=SLC,OU=People,DC=plansource,DC=local
+    external_id: ldap-ecopp
     time_format: relative
   - name: Eric Parshall
-    role_id: 1
+    id: 0
+    project_role_id: 1
+    system_role_id: 0
     email: Eric.Parshall@plansource.com
-    external_id: ldap-CN=Eric Parshall,OU=Employees,OU=SLC,OU=People,DC=plansource,DC=local
+    external_id: ldap-eparshall
     time_format: relative
   - name: Frank Ping
-    role_id: 1
+    id: 0
+    project_role_id: 1
+    system_role_id: 0
     email: frank.ping@plansource.com
-    external_id: ldap-CN=Frank Ping,OU=Remote Office,OU=People,DC=plansource,DC=local
+    external_id: ldap-fping
     time_format: relative
   - name: Gerald Nichols
-    role_id: 1
+    id: 0
+    project_role_id: 1
+    system_role_id: 0
     email: Gerald.Nichols@plansource.com
-    external_id: ldap-CN=Gerald Nichols,OU=Employees,OU=SLC,OU=People,DC=plansource,DC=local
+    external_id: ldap-gnichols
     time_format: relative
   - name: Glenda Szura
-    role_id: 1
+    id: 0
+    project_role_id: 1
+    system_role_id: 0
     email: Glenda.Szura@plansource.com
-    external_id: ldap-CN=Glenda Szura,OU=Employees,OU=ORL,OU=People,DC=plansource,DC=local
+    external_id: ldap-gszura
     time_format: relative
   - name: Glenn Sacks
-    role_id: 1
+    id: 0
+    project_role_id: 1
+    system_role_id: 0
     email: Glenn.Sacks@plansource.com
-    external_id: ldap-CN=Glenn Sacks,OU=Employees,OU=ORL,OU=People,DC=plansource,DC=local
+    external_id: ldap-gsacks
     time_format: relative
   - name: Guario Rodriguez
-    role_id: 1
+    id: 0
+    project_role_id: 1
+    system_role_id: 0
     email: Guario.Rodriguez@plansource.com
-    external_id: ldap-CN=Guario Rodriguez,OU=Employees,OU=ORL,OU=People,DC=plansource,DC=local
+    external_id: ldap-grodriguez
     time_format: relative
   - name: Janish Patel
-    role_id: 1
+    id: 0
+    project_role_id: 1
+    system_role_id: 0
     email: janish.patel@plansource.com
-    external_id: ldap-CN=Janish Patel,OU=Remote Office,OU=People,DC=plansource,DC=local
+    external_id: ldap-jpatel
     time_format: relative
   - name: Joe Risner
-    role_id: 1
+    id: 0
+    project_role_id: 1
+    system_role_id: 0
     email: Joe.Risner@plansource.com
-    external_id: ldap-CN=Joe Risner,OU=Employees,OU=SLC,OU=People,DC=plansource,DC=local
+    external_id: ldap-jrisner
     time_format: relative
   - name: Kameron Were
-    role_id: 1
+    id: 0
+    project_role_id: 1
+    system_role_id: 0
     email: Kameron.Were@plansource.com
-    external_id: ldap-CN=Kameron Were,OU=Employees,OU=SLC,OU=People,DC=plansource,DC=local
+    external_id: ldap-kwere
     time_format: relative
   - name: Kevin Mellander
-    role_id: 1
+    id: 0
+    project_role_id: 1
+    system_role_id: 0
     email: Kevin.Mellander@plansource.com
-    external_id: ldap-CN=Kevin Mellander,OU=Employees,OU=SLC,OU=People,DC=plansource,DC=local
+    external_id: ldap-kmellander
     time_format: relative
   - name: Londa Meckes
-    role_id: 1
+    id: 0
+    project_role_id: 1
+    system_role_id: 0
     email: Londa.Meckes@plansource.com
-    external_id: ldap-CN=Londa Meckes,OU=Employees,OU=ORL,OU=People,DC=plansource,DC=local
+    external_id: ldap-lmeckes
     time_format: relative
   - name: Manuel Benavente
-    role_id: 1
+    id: 0
+    project_role_id: 1
+    system_role_id: 0
     email: Manuel.Benavente@plansource.com
-    external_id: ldap-CN=Manuel Benavente,OU=Employees,OU=ORL,OU=People,DC=plansource,DC=local
+    external_id: ldap-mbenavente
     time_format: relative
   - name: Mark Kadlec
-    role_id: 1
+    id: 0
+    project_role_id: 1
+    system_role_id: 0
     email: Mark.Kadlec@plansource.com
-    external_id: ldap-CN=Mark Kadlec,OU=Employees,OU=SLC,OU=People,DC=plansource,DC=local
+    external_id: ldap-mkadlec
     time_format: relative
   - name: Mark Nguyen
-    role_id: 1
+    id: 0
+    project_role_id: 1
+    system_role_id: 0
     email: Mark.Nguyen@plansource.com
-    external_id: ldap-CN=Mark Nguyen,OU=Employees,OU=ORL,OU=People,DC=plansource,DC=local
+    external_id: ldap-mnguyen
     time_format: relative
   - name: Matt Gibbs
-    role_id: 1
+    id: 0
+    project_role_id: 1
+    system_role_id: 0
     email: Matt.Gibbs@plansource.com
-    external_id: ldap-CN=Matt Gibbs,OU=Employees,OU=SLC,OU=People,DC=plansource,DC=local
+    external_id: ldap-mgibbs
     time_format: relative
   - name: Melissa Michaels
-    role_id: 1
+    id: 0
+    project_role_id: 1
+    system_role_id: 0
     email: Melissa.Michaels@plansource.com
-    external_id: ldap-CN=Melissa Michaels,OU=Employees,OU=ORL,OU=People,DC=plansource,DC=local
+    external_id: ldap-mmichaels
     time_format: relative
   - name: Michael Blanco
-    role_id: 1
+    id: 0
+    project_role_id: 1
+    system_role_id: 0
     email: Michael.Blanco@plansource.com
-    external_id: ldap-CN=Michael Blanco,OU=Employees,OU=ORL,OU=People,DC=plansource,DC=local
+    external_id: ldap-mblanco
     time_format: relative
   - name: Nash Stewart
-    role_id: 1
+    id: 0
+    project_role_id: 1
+    system_role_id: 0
     email: Nash.Stewart@plansource.com
-    external_id: ldap-CN=Nash Stewart,OU=Employees,OU=SLC,OU=People,DC=plansource,DC=local
+    external_id: ldap-nstewart
     time_format: relative
   - name: Nathan Western
-    role_id: 1
+    id: 0
+    project_role_id: 1
+    system_role_id: 0
     email: Nathan.Western@plansource.com
-    external_id: ldap-CN=Nathan Western,OU=Employees,OU=SLC,OU=People,DC=plansource,DC=local
+    external_id: ldap-nwestern
     time_format: relative
   - name: Rachel Williams
-    role_id: 1
+    id: 0
+    project_role_id: 1
+    system_role_id: 0
     email: Rachel.Williams@plansource.com
-    external_id: ldap-CN=Rachel Williams,OU=Employees,OU=ORL,OU=People,DC=plansource,DC=local
+    external_id: ldap-rwilliams
     time_format: relative
   - name: Randy See
-    role_id: 1
+    id: 0
+    project_role_id: 1
+    system_role_id: 0
     email: Randy.See@plansource.com
-    external_id: ldap-CN=Randy See,OU=Employees,OU=ORL,OU=People,DC=plansource,DC=local
+    external_id: ldap-rsee
     time_format: relative
   - name: Ricardo Valdes
-    role_id: 1
+    id: 0
+    project_role_id: 1
+    system_role_id: 0
     email: Ricardo.Valdes@plansource.com
-    external_id: ldap-CN=Ricardo Valdes,OU=Employees,OU=ORL,OU=People,DC=plansource,DC=local
+    external_id: ldap-rvaldes
     time_format: relative
   - name: Sean Foreman
-    role_id: 1
+    id: 0
+    project_role_id: 1
+    system_role_id: 0
     email: Sean.Foreman@plansource.com
-    external_id: ldap-CN=Sean Foreman,OU=Employees,OU=MIN,OU=People,DC=plansource,DC=local
+    external_id: ldap-sforeman
     time_format: relative
   - name: Sreenivas Boralingiah
-    role_id: 1
+    id: 0
+    project_role_id: 1
+    system_role_id: 0
     email: Sreenivas.Boralingiah@plansource.com
-    external_id: ldap-CN=Sreenivas Boralingiah,OU=Employees,OU=SLC,OU=People,DC=plansource,DC=local
+    external_id: ldap-sboralingiah
     time_format: relative
   - name: Timothy Hunt
-    role_id: 1
+    id: 0
+    project_role_id: 1
+    system_role_id: 0
     email: Timothy.Hunt@plansource.com
-    external_id: ldap-CN=Timothy Hunt,OU=Employees,OU=ORL,OU=People,DC=plansource,DC=local
+    external_id: ldap-thunt
     time_format: relative
   - name: Tom Phan
-    role_id: 1
+    id: 0
+    project_role_id: 1
+    system_role_id: 0
     email: Tom.Phan@plansource.com
-    external_id: ldap-CN=Tom Phan,OU=Employees,OU=SLC,OU=People,DC=plansource,DC=local
+    external_id: ldap-tphan
     time_format: relative
   - name: Travis Rudisill
-    role_id: 1
+    id: 0
+    project_role_id: 1
+    system_role_id: 0
     email: Travis.Rudisill@plansource.com
-    external_id: ldap-CN=Travis Rudisill,OU=Employees,OU=ORL,OU=People,DC=plansource,DC=local
+    external_id: ldap-trudisill
     time_format: relative
   - name: Victoria Garrett
-    role_id: 1
+    id: 0
+    project_role_id: 1
+    system_role_id: 0
     email: Victoria.Garrett@plansource.com
-    external_id: ldap-CN=Victoria Garrett,OU=Remote Office,OU=People,DC=plansource,DC=local
+    external_id: ldap-vgarrett
     time_format: relative
   - name: Amanda (Lund) Anderson
-    role_id: 2
+    id: 0
+    project_role_id: 2
+    system_role_id: 0
     email: amanda.lund@plansource.com
-    external_id: ldap-CN=Amanda (Lund) Anderson,OU=Employees,OU=SLC,OU=People,DC=plansource,DC=local
+    external_id: ldap-alund
     time_format: relative
   - name: Chad Broadhead
-    role_id: 2
+    id: 0
+    project_role_id: 2
+    system_role_id: 0
     email: Chad.Broadhead@plansource.com
-    external_id: ldap-CN=Chad Broadhead,OU=Employees,OU=SLC,OU=People,DC=plansource,DC=local
+    external_id: ldap-cbroadhead
     time_format: relative
   - name: Dave Horn
-    role_id: 2
+    id: 0
+    project_role_id: 2
+    system_role_id: 0
     email: dave.horn@plansource.com
-    external_id: ldap-CN=Dave Horn,OU=Remote Office,OU=People,DC=plansource,DC=local
+    external_id: ldap-dhorn
     time_format: relative
   - name: Denis Kadyrko
-    role_id: 2
+    id: 0
+    project_role_id: 2
+    system_role_id: 0
     email: denis.kadyrko@plansource.com
-    external_id: ldap-CN=Denis Kadyrko,OU=BelTech,OU=External Clients,OU=People,DC=plansource,DC=local
+    external_id: ldap-dkadyrko
     time_format: relative
   - name: Ellen Mousseau
-    role_id: 2
+    id: 0
+    project_role_id: 2
+    system_role_id: 0
     email: Ellen.Mousseau@plansource.com
-    external_id: ldap-CN=Ellen Mousseau,OU=Remote Office,OU=People,DC=plansource,DC=local
+    external_id: ldap-emousseau
     time_format: relative
   - name: Eugene Naruta
-    role_id: 2
+    id: 0
+    project_role_id: 2
+    system_role_id: 0
     email: Eugene.Naruta@plansource.com
-    external_id: ldap-CN=Eugene Naruta,OU=BelTech,OU=External Clients,OU=People,DC=plansource,DC=local
+    external_id: ldap-enaruta
     time_format: relative
   - name: Maksim Shuleika
-    role_id: 2
+    id: 0
+    project_role_id: 2
+    system_role_id: 0
     email: Maksim.Shuleika@plansource.com
-    external_id: ldap-CN=Maksim Shuleika,OU=Employees,OU=SLC,OU=People,DC=plansource,DC=local
+    external_id: ldap-mshuleika
     time_format: relative
   - name: Ryan Baldwin
-    role_id: 2
+    id: 0
+    project_role_id: 2
+    system_role_id: 0
     email: ryan.baldwin@plansource.com
-    external_id: ldap-CN=Ryan Baldwin,OU=Employees,OU=SLC,OU=People,DC=plansource,DC=local
+    external_id: ldap-rbaldwin
     time_format: relative
   - name: Sergey Mazur
-    role_id: 2
+    id: 0
+    project_role_id: 2
+    system_role_id: 0
     email: Sergey.Mazur@plansource.com
-    external_id: ldap-CN=Sergey Mazur,OU=BelTech,OU=External Clients,OU=People,DC=plansource,DC=local
+    external_id: ldap-smazur
     time_format: relative
   - name: Thomas Leishman
-    role_id: 2
+    id: 0
+    system_role_id: 3
     email: Thomas.Leishman@plansource.com
-    external_id: ldap-CN=Thomas Leishman,OU=Employees,OU=SLC,OU=People,DC=plansource,DC=local
+    external_id: ldap-tleishman
     time_format: relative
   - name: Dan Finn
-    role_id: 3
+    id: 0
+    system_role_id: 3
     email: Dan.Finn@plansource.com
-    external_id: ldap-CN=Dan Finn,OU=Employees,OU=IT People Accounts,OU=People,DC=plansource,DC=local
+    external_id: ldap-dfinn
     time_format: relative
   - name: David Moore
-    role_id: 3
+    id: 0
+    system_role_id: 3
     email: David.Moore@plansource.com
-    external_id: ldap-CN=David Moore,OU=Employees,OU=IT People Accounts,OU=People,DC=plansource,DC=local
+    external_id: ldap-dmoore
     time_format: relative
   - name: Dustin Makepeace
-    role_id: 3
+    id: 0
+    system_role_id: 3
     email: Dustin.Makepeace@plansource.com
-    external_id: ldap-CN=Dustin Makepeace,OU=Employees,OU=IT People Accounts,OU=People,DC=plansource,DC=local
+    external_id: ldap-dmakepeace
     time_format: relative
   - name: Franck Fallateuf
-    role_id: 3
+    id: 0
+    system_role_id: 3
     email: franck.fallateuf@plansource.com
-    external_id: ldap-CN=Franck Fallateuf,OU=Employees,OU=IT People Accounts,OU=People,DC=plansource,DC=local
+    external_id: ldap-ffallateuf
     time_format: relative
   - name: Geoff Scott
-    role_id: 3
+    id: 0
+    system_role_id: 3
     email: Geoff.Scott@plansource.com
-    external_id: ldap-CN=Geoff Scott,OU=Employees,OU=IT People Accounts,OU=People,DC=plansource,DC=local
+    external_id: ldap-gscott
+    time_format: relative
+  - name: Anooj Rajan
+    id: 0
+    system_role_id: 3
+    email: Anooj.Rajan@plansource.com
+    external_id: ldap-arajan
     time_format: relative
   - name: Jason Rutherford
-    role_id: 3
+    id: 0
+    system_role_id: 3
     email: jason.rutherford@plansource.com
-    external_id: ldap-CN=Jason Rutherford,OU=Remote Office,OU=People,DC=plansource,DC=local
+    external_id: ldap-jrutherford
     time_format: relative
   - name: Jesse Goerz
-    role_id: 3
+    id: 0
+    system_role_id: 3
     email: Jesse.Goerz@plansource.com
-    external_id: ldap-CN=Jesse Goerz,OU=Employees,OU=ORL,OU=People,DC=plansource,DC=local
+    external_id: ldap-jgoerz
     time_format: relative

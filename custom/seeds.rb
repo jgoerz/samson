@@ -84,13 +84,12 @@ if data.key?('projects')
             else
               cmd = nil
               if result.first['meta_env'] =~ /^branch,/ # Super ewww!
-                cmd = result.select do |c| 
+                cmd = result.detect do |c| 
                   not_used, *branches = *c['meta_env'].split(',') 
-                  branches.any? do |branch|
-                    "#{stage['cmd_meta_env']}" =~ Regexp.new("#{branch}|#{branch}-utllity")
+                  branches.detect do |branch|
+                    "#{stage['cmd_meta_env']}" == branch || "#{stage['cmd_meta_env']}" == "#{branch}-utility"
                   end
                 end
-                cmd = cmd.first
               else
                 cmd = result.select{|c| c['meta_env'] == stage['cmd_meta_env']}.first
               end
@@ -149,14 +148,31 @@ end
 # role_id: (see app/models/role.rb for appropriate values)
 if data.key?('users')
   data['users'].each do |user|
-    User.create!(
+    u_obj = User.create!(
       time_format: user['time_format'],
-      role_id: user['role_id'],
+      role_id: user['system_role_id'],
       name: user['name'],
       email: user['email'],
       external_id: user['external_id']
     )
+    user['id'] = u_obj.id
   end
 end
 
 
+
+# Set up project level perms.
+if data.key?('users')
+  project_users = data['users'].select{|user| user['system_role_id'] == 0}
+
+  data['projects'].each do |project|
+    project_users.each do |user|
+      UserProjectRole.create!(
+        project_id: project['id'],
+        user_id: user['id'],
+        role_id: user['project_role_id']
+      )
+    end
+  end
+
+end
