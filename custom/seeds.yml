@@ -21,9 +21,6 @@ projects:
         permalink: "dev-utility"
         cancel_queued_deploys: true
         cmd_meta_env: dev-utility
-        webhooks:
-          - branch: "origin/develop"
-            source: "jenkins"
         notify_slack: true
         do_stage_commands: true
       - name: Trion DEV Apps
@@ -57,9 +54,6 @@ projects:
         permalink: "partner-dev-utility"
         cancel_queued_deploys: true
         cmd_meta_env: partner-dev-utility
-        webhooks:
-          - branch: "origin/develop"
-            source: "jenkins"
         notify_slack: true
         do_stage_commands: true
       - name: UAT Apps
@@ -79,9 +73,6 @@ projects:
         permalink: "uat-utility"
         cancel_queued_deploys: true
         cmd_meta_env: uat-utility
-        webhooks:
-          - branch: "origin/develop"
-            source: "jenkins"
         notify_slack: true
         do_stage_commands: true
       - name: Trion UAT Apps
@@ -105,7 +96,6 @@ projects:
         cmd_meta_env: rc
         pipelines:
           - "RC Utility"
-          - "Cycle Server RC"
         webhooks:
           - branch: "origin/rc-patches"
             source: "jenkins"
@@ -116,9 +106,6 @@ projects:
         permalink: "rc-utility"
         cancel_queued_deploys: true
         cmd_meta_env: rc-utility
-        webhooks:
-          - branch: "origin/rc-patches"
-            source: "jenkins"
         notify_slack: true
         do_stage_commands: true
       - name: Cycle Server RC
@@ -222,8 +209,6 @@ projects:
         permalink: "rc-apps"
         cancel_queued_deploys: true
         cmd_meta_env: rc
-        pipelines:
-          - "Cycle Server RC"
         webhooks:
           - branch: "origin/rc-patches"
             source: "jenkins"
@@ -316,8 +301,6 @@ projects:
         permalink: "rc-apps"
         cancel_queued_deploys: true
         cmd_meta_env: rc
-        pipelines:
-          - "Cycle Server RC"
         webhooks:
           - branch: "origin/rc-patches"
             source: "jenkins"
